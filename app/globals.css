@@ -1,0 +1,240 @@
+@import "tailwindcss";
+
+/* ============================================================
+   ANUGERAH VENTURES — GLOBAL DESIGN SYSTEM
+   ============================================================ */
+
+/* --- CSS Custom Properties (Design Tokens) --- */
+:root {
+  /* Color Palette — from PRD */
+  --color-base: #0c1f20;         /* Dark Turquoise / Deep Space — primary bg */
+  --color-surface: #051011;      /* Deep surface overlay */
+  --color-text: #f8f9fa;         /* Off-White — primary text */
+  --color-text-muted: rgba(248, 249, 250, 0.45);
+  --color-text-subtle: rgba(248, 249, 250, 0.25);
+
+  /* Metallic Silver — accent */
+  --color-silver: #c0c0c0;
+  --color-silver-light: #d8d8d8;
+  --color-silver-dark: #a0a0a0;
+  --gradient-silver: linear-gradient(
+    135deg,
+    #8a8a8a 0%,
+    #c8c8c8 30%,
+    #f0f0f0 50%,
+    #c8c8c8 70%,
+    #8a8a8a 100%
+  );
+
+  /* Typography */
+  --font-helvetica: "Inter", "Helvetica Neue", "Helvetica", Arial, sans-serif;
+  --font-citadel: "Playfair Display", "Georgia", serif; /* placeholder for Citadel */
+
+  /* Spacing & Layout */
+  --nav-height: 64px;
+
+  /* Timing functions */
+  --ease-mechanical: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-expo: cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-inout-expo: cubic-bezier(0.87, 0, 0.13, 1);
+}
+
+/* --- Base Resets --- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: auto; /* GSAP handles all scroll — disable native smooth scroll */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  background-color: var(--color-base);
+  color: var(--color-text);
+  font-family: var(--font-helvetica);
+  font-size: clamp(15px, 1.1vw, 18px);
+  line-height: 1.65;
+  overflow-x: hidden;
+  /* The WebGL canvas sits behind everything else via position:fixed z-index:-1 */
+}
+
+/* --- Typography Utilities --- */
+.font-helvetica {
+  font-family: var(--font-helvetica);
+}
+
+.font-citadel {
+  font-family: var(--font-citadel);
+}
+
+/* --- Metallic Silver Text --- */
+.text-silver {
+  background: var(--gradient-silver);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* --- Glassmorphism Utility --- */
+.glass {
+  background: rgba(12, 31, 32, 0.55);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border-bottom: 1px solid rgba(248, 249, 250, 0.06);
+}
+
+/* --- Selection Style --- */
+::selection {
+  background: rgba(192, 192, 192, 0.2);
+  color: var(--color-text);
+}
+
+/* --- Scrollbar (minimal, webkit) --- */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(192, 192, 192, 0.25);
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(192, 192, 192, 0.45);
+}
+
+/* --- Focus ring — accessible but styled --- */
+:focus-visible {
+  outline: 1px solid var(--color-silver);
+  outline-offset: 3px;
+}
+
+/* --- Utility: SR-only (screen reader) --- */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* --- Tailwind CSS v4 theme extension --- */
+@theme {
+  /* Colors */
+  --color-av-base: #0c1f20;
+  --color-av-surface: #051011;
+  --color-av-text: #f8f9fa;
+  --color-av-silver: #c0c0c0;
+
+  /* Font families */
+  --font-helvetica: "Inter", "Helvetica Neue", "Helvetica", Arial, sans-serif;
+  --font-citadel: "Playfair Display", "Georgia", serif;
+}
+
+/* ============================================================
+   PROSE-AV — Article / MDX Typography
+   Applied to .prose-av wrapper in /insights/[slug] pages.
+   Must live here (not in styled-jsx) because it targets
+   elements generated at runtime by next-mdx-remote.
+   ============================================================ */
+.prose-av h2 {
+  font-family: var(--font-helvetica);
+  font-size: clamp(1.2rem, 2vw, 1.5rem);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+  color: var(--color-text);
+  margin-top: 3rem;
+  margin-bottom: 1rem;
+}
+
+.prose-av h3 {
+  font-family: var(--font-helvetica);
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--color-text);
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+}
+
+.prose-av p {
+  font-family: var(--font-helvetica);
+  font-size: clamp(0.95rem, 1.1vw, 1.05rem);
+  font-weight: 300;
+  line-height: 1.85;
+  color: var(--color-text-muted);
+  margin-bottom: 1.5rem;
+}
+
+.prose-av strong {
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.prose-av em {
+  font-style: italic;
+  color: var(--color-silver-light);
+}
+
+.prose-av blockquote {
+  border-left: 2px solid var(--color-silver);
+  padding-left: 1.25rem;
+  margin: 2rem 0;
+  font-style: italic;
+  color: var(--color-text-muted);
+}
+
+.prose-av a {
+  color: var(--color-silver-light);
+  text-decoration-color: rgba(192, 192, 192, 0.3);
+  text-underline-offset: 3px;
+  transition: color 0.2s ease;
+}
+
+.prose-av a:hover {
+  color: var(--color-text);
+}
+
+.prose-av ul,
+.prose-av ol {
+  padding-left: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.prose-av li {
+  font-family: var(--font-helvetica);
+  font-size: clamp(0.95rem, 1.1vw, 1.05rem);
+  font-weight: 300;
+  line-height: 1.75;
+  color: var(--color-text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.prose-av code {
+  font-family: "Courier New", monospace;
+  font-size: 0.85em;
+  background: rgba(192, 192, 192, 0.08);
+  padding: 0.15em 0.4em;
+  border-radius: 2px;
+  color: var(--color-silver-light);
+}
+
+.prose-av hr {
+  border: none;
+  border-top: 1px solid rgba(192, 192, 192, 0.1);
+  margin: 3rem 0;
+}
