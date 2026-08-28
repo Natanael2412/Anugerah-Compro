@@ -1,12 +1,16 @@
 import Link from "next/link";
-import { articles } from "@/lib/data/articles";
+import { getAllArticles } from "@/lib/data/articles";
 import AdminNav from "@/components/admin/AdminNav";
+import DeleteArticleButton from "@/components/admin/DeleteArticleButton";
 
 function formatDate(dateStr: string) {
+  if (!dateStr) return "-";
   return new Intl.DateTimeFormat("id-ID", { year: "numeric", month: "short", day: "numeric" }).format(new Date(dateStr));
 }
 
-export default function AdminArticlesPage() {
+export default async function AdminArticlesPage() {
+  const articles = await getAllArticles();
+
   return (
     <div style={{ minHeight: "100vh", background: "var(--color-base)" }}>
       <AdminNav />
@@ -79,7 +83,7 @@ export default function AdminArticlesPage() {
                   </td>
                   <td style={{ padding: "1rem", verticalAlign: "middle" }}>
                     <div style={{ display: "flex", gap: "0.4rem" }}>
-                      {article.tags.slice(0, 2).map((t) => (
+                      {article.tags?.slice(0, 2).map((t) => (
                         <span key={t} style={{ fontFamily: "var(--font-helvetica)", fontSize: "0.6rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--color-text-subtle)", border: "1px solid rgba(192,192,192,0.1)", padding: "0.15rem 0.4rem", borderRadius: "2px" }}>
                           {t}
                         </span>
@@ -87,13 +91,13 @@ export default function AdminArticlesPage() {
                     </div>
                   </td>
                   <td style={{ padding: "1rem", verticalAlign: "middle" }}>
-                    <time dateTime={article.publishedAt} style={{ fontFamily: "var(--font-helvetica)", fontSize: "0.75rem", color: "var(--color-text-muted)", whiteSpace: "nowrap" }}>
-                      {formatDate(article.publishedAt)}
+                    <time dateTime={article.published_at} style={{ fontFamily: "var(--font-helvetica)", fontSize: "0.75rem", color: "var(--color-text-muted)", whiteSpace: "nowrap" }}>
+                      {formatDate(article.published_at)}
                     </time>
                   </td>
                   <td style={{ padding: "1rem", verticalAlign: "middle" }}>
                     <span style={{ fontFamily: "var(--font-helvetica)", fontSize: "0.75rem", color: "var(--color-text-subtle)" }}>
-                      {article.readingTime}m
+                      {article.reading_time || 0}m
                     </span>
                   </td>
                   <td style={{ padding: "1rem", verticalAlign: "middle" }}>
@@ -109,16 +113,26 @@ export default function AdminArticlesPage() {
                     >
                       View →
                     </Link>
+                    <Link
+                      href={`/admin/articles/${article.id}/edit`}
+                      style={{ fontFamily: "var(--font-helvetica)", fontSize: "0.65rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-text-subtle)", textDecoration: "none", marginLeft: "1rem" }}
+                    >
+                      Edit
+                    </Link>
+                    <DeleteArticleButton id={article.id} title={article.title} />
                   </td>
                 </tr>
               ))}
+              {articles.length === 0 && (
+                <tr>
+                  <td colSpan={6} style={{ textAlign: "center", padding: "3rem", color: "var(--color-text-subtle)" }}>
+                    Belum ada artikel. Klik "Write Article" untuk membuat baru.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
-
-        <p style={{ fontFamily: "var(--font-helvetica)", fontSize: "0.75rem", color: "var(--color-text-subtle)", marginTop: "2rem", fontStyle: "italic" }}>
-          ⚡ Phase 4: Hubungkan Supabase untuk edit, publish toggle, dan hapus artikel dari CMS.
-        </p>
       </main>
     </div>
   );

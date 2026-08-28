@@ -1,20 +1,18 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { compileMDX } from "next-mdx-remote/rsc";
-import { articles } from "@/lib/data/articles";
+import { getArticleBySlug, getPublishedArticles } from "@/lib/data/articles";
 import ReadingProgress from "@/components/article/ReadingProgress";
+import RichTextRenderer from "@/components/editor/RichTextRenderer";
 
 interface Props {
   params: Promise<{ slug: string }>;
 }
 
-export function generateStaticParams() {
-  return articles.map((a) => ({ slug: a.slug }));
-}
+
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const article = articles.find((a) => a.slug === slug);
+  const article = await getArticleBySlug(slug);
 
   if (!article) return { title: "Article Not Found" };
 
@@ -25,8 +23,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: `${article.title} — Anugerah Ventures`,
       description: article.excerpt,
       type: "article",
-      publishedTime: article.publishedAt,
+      publishedTime: article.published_at,
       tags: article.tags,
+      ...(article.cover_image_url && { images: [{ url: article.cover_image_url }] }),
     },
   };
 }
@@ -41,26 +40,18 @@ function formatDate(dateStr: string) {
 
 export default async function InsightDetailPage({ params }: Props) {
   const { slug } = await params;
-  const article = articles.find((a) => a.slug === slug);
+  const article = await getArticleBySlug(slug);
 
   if (!article) notFound();
 
-  // Compile Markdown to React — server-side (no client JS needed)
-  const { content } = await compileMDX({
-    source: article.content_md,
-    options: { parseFrontmatter: false },
-  });
-
   // ── JSON-LD Schema.org — BlogPosting ──────────────────────
-  // Required by PRD for SEO, AEO, GEO authority signaling.
-  // Recognized by Google AI, Perplexity, ChatGPT as high-authority content.
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
     headline: article.title,
     description: article.excerpt,
-    datePublished: article.publishedAt,
-    dateModified: article.publishedAt,
+    datePublished: article.published_at,
+    dateModified: article.published_at,
     author: {
       "@type": "Organization",
       name: "Anugerah Ventures",
@@ -75,6 +66,7 @@ export default async function InsightDetailPage({ params }: Props) {
       "@type": "WebPage",
       "@id": `${process.env.NEXT_PUBLIC_SITE_URL ?? "https://anugerahventures.id"}/insights/${article.slug}`,
     },
+    ...(article.cover_image_url && { image: article.cover_image_url }),
     keywords: article.tags.join(", "),
     inLanguage: "id-ID",
     articleSection: article.tags[0] ?? "Insights",
@@ -82,7 +74,7 @@ export default async function InsightDetailPage({ params }: Props) {
 
   return (
     <>
-      {/* JSON-LD injected into <head> via Next.js script tag convention */}
+      {/* JSON-LD */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -122,6 +114,22 @@ export default async function InsightDetailPage({ params }: Props) {
             ))}
           </div>
 
+          {/* Cover image */}
+          {article.cover_image_url && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={article.cover_image_url}
+              alt={article.title}
+              style={{
+                width: "100%",
+                maxHeight: "420px",
+                objectFit: "cover",
+                borderRadius: "2px",
+                marginBottom: "2rem",
+              }}
+            />
+          )}
+
           {/* Title */}
           <h1
             style={{
@@ -138,35 +146,22 @@ export default async function InsightDetailPage({ params }: Props) {
             {article.title}
           </h1>
 
-          {/* Meta: date + reading time */}
+          {/* Meta */}
           <div style={{ display: "flex", gap: "1.5rem", alignItems: "center" }}>
             <time
-              dateTime={article.publishedAt}
-              style={{
-                fontFamily: "var(--font-helvetica)",
-                fontSize: "0.7rem",
-                letterSpacing: "0.12em",
-                color: "var(--color-text-subtle)",
-              }}
+              dateTime={article.published_at}
+              style={{ fontFamily: "var(--font-helvetica)", fontSize: "0.7rem", letterSpacing: "0.12em", color: "var(--color-text-subtle)" }}
             >
-              {formatDate(article.publishedAt)}
+              {formatDate(article.published_at)}
             </time>
             <span style={{ color: "var(--color-text-subtle)", fontSize: "0.7rem" }}>·</span>
-            <span
-              style={{
-                fontFamily: "var(--font-helvetica)",
-                fontSize: "0.7rem",
-                letterSpacing: "0.12em",
-                color: "var(--color-text-subtle)",
-              }}
-            >
-              {article.readingTime} menit baca
+            <span style={{ fontFamily: "var(--font-helvetica)", fontSize: "0.7rem", letterSpacing: "0.12em", color: "var(--color-text-subtle)" }}>
+              {article.reading_time || 0} menit baca
             </span>
           </div>
         </header>
 
-        {/* ── ARTICLE BODY ────────────────────────────────────── */}
-        {/* max-width: 65ch per PRD for optimal reading comfort */}
+        {/* ── ARTICLE BODY ─────────────────────────────────── */}
         <article
           id="article-body"
           style={{
@@ -175,9 +170,8 @@ export default async function InsightDetailPage({ params }: Props) {
             padding: "clamp(3rem, 7vh, 5rem) clamp(1.5rem, 4vw, 2rem)",
           }}
         >
-          <div className="prose-av">
-            {content}
-          </div>
+          {/* RichTextRenderer: TipTap JSON → HTML, zero client JS */}
+          <RichTextRenderer content={article.content_json} className="prose-av" />
         </article>
 
         {/* Bottom nav */}
@@ -204,7 +198,6 @@ export default async function InsightDetailPage({ params }: Props) {
           </a>
         </div>
       </div>
-
     </>
   );
 }

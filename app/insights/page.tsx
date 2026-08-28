@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { articles } from "@/lib/data/articles";
+import { getPublishedArticles } from "@/lib/data/articles";
 
 export const metadata: Metadata = {
   title: "Insights",
@@ -21,8 +21,8 @@ function formatDate(dateStr: string) {
   }).format(new Date(dateStr));
 }
 
-export default function InsightsPage() {
-  const published = articles.filter((a) => a.is_av_published);
+export default async function InsightsPage() {
+  const published = await getPublishedArticles();
 
   return (
     <div style={{ minHeight: "100vh" }}>
@@ -136,7 +136,7 @@ export default function InsightsPage() {
                   {/* Content */}
                   <div>
                     <div style={{ display: "flex", gap: "1rem", alignItems: "center", marginBottom: "0.5rem", flexWrap: "wrap" }}>
-                      {article.tags.slice(0, 2).map((tag) => (
+                      {article.tags?.slice(0, 2).map((tag) => (
                         <span
                           key={tag}
                           style={{
@@ -192,7 +192,7 @@ export default function InsightsPage() {
                     }}
                   >
                     <time
-                      dateTime={article.publishedAt}
+                      dateTime={article.published_at}
                       style={{
                         fontFamily: "var(--font-helvetica)",
                         fontSize: "0.65rem",
@@ -201,7 +201,7 @@ export default function InsightsPage() {
                         whiteSpace: "nowrap",
                       }}
                     >
-                      {formatDate(article.publishedAt)}
+                      {formatDate(article.published_at)}
                     </time>
                     <span
                       style={{
@@ -212,7 +212,7 @@ export default function InsightsPage() {
                         whiteSpace: "nowrap",
                       }}
                     >
-                      {article.readingTime} min read
+                      {article.reading_time || 0} min read
                     </span>
                   </div>
                 </article>

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import dynamic from "next/dynamic";
-import { projects } from "@/lib/data/projects";
+import { getPublishedProjects } from "@/lib/data/projects";
+import { getPublishedArticles } from "@/lib/data/articles";
 
 /**
  * All three sections are Client Components (GSAP / TanStack).
@@ -12,6 +13,9 @@ const CurtainedNarrative = dynamic(
 );
 const HorizontalShowcase = dynamic(
   () => import("@/components/sections/HorizontalShowcase")
+);
+const LatestInsights = dynamic(
+  () => import("@/components/sections/LatestInsights")
 );
 
 /* ============================================================
@@ -31,9 +35,32 @@ export const metadata: Metadata = {
 /* ============================================================
    HOME PAGE (Server Component — no styled-jsx, no client APIs)
    ============================================================ */
-export default function HomePage() {
+export default async function HomePage() {
+  const [publishedProjects, publishedArticles] = await Promise.all([
+    getPublishedProjects(),
+    getPublishedArticles()
+  ]);
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "Anugerah Ventures",
+    url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://anugerahventures.com",
+    description: "Bespoke digital experiences, strategic technology leadership, and enterprise product development.",
+    sameAs: [],
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: "Jakarta",
+      addressCountry: "ID",
+    },
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* Section 1: The Core — Hero */}
       <HeroSection />
 
@@ -41,7 +68,10 @@ export default function HomePage() {
       <CurtainedNarrative />
 
       {/* Section 3: The Horizontal Showcase */}
-      <HorizontalShowcase projects={projects} />
+      <HorizontalShowcase projects={publishedProjects} />
+
+      {/* Section 4: Latest Insights */}
+      <LatestInsights articles={publishedArticles} />
     </>
   );
 }

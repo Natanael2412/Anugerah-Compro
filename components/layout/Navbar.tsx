@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -88,28 +89,21 @@ export default function Navbar() {
         className="navbar__inner"
         aria-label="Main navigation"
       >
-        {/* Logo — "AV" initials in Citadel (Playfair Display placeholder) */}
+        {/* Logo */}
         <Link
           href="/"
           className="navbar__logo"
           aria-label="Anugerah Ventures — Home"
         >
-          <span aria-hidden="true">AV</span>
+          <Image 
+            src="/Logo-AV.avif" 
+            alt="Anugerah Ventures" 
+            width={280} 
+            height={64} 
+            style={{ width: "auto", height: "clamp(48px, 7vh, 64px)", objectFit: "contain" }}
+            priority
+          />
         </Link>
-
-        {/* Navigation Links */}
-        <ul className="navbar__links" role="list">
-          <li>
-            <Link href="/#work" className="navbar__link" id="nav-link-work">
-              Work
-            </Link>
-          </li>
-          <li>
-            <Link href="/insights" className="navbar__link" id="nav-link-insights">
-              Insights
-            </Link>
-          </li>
-        </ul>
       </nav>
 
       <style jsx>{`
@@ -142,14 +136,14 @@ export default function Navbar() {
         .navbar__inner {
           display: flex;
           align-items: center;
-          justify-content: space-between;
+          justify-content: flex-end; /* Logo dipindah ke kanan */
           height: 100%;
           max-width: 1400px;
           margin: 0 auto;
           padding: 0 clamp(1.25rem, 4vw, 3rem);
         }
 
-        /* Logo: Citadel font (Playfair Display) */
+        /* Logo */
         .navbar__logo {
           font-family: var(--font-citadel);
           font-size: clamp(1.1rem, 1.8vw, 1.4rem);
@@ -171,46 +165,6 @@ export default function Navbar() {
           background: var(--gradient-silver);
           -webkit-background-clip: text;
           background-clip: text;
-        }
-
-        .navbar__links {
-          display: flex;
-          align-items: center;
-          gap: clamp(1.5rem, 3vw, 2.5rem);
-          list-style: none;
-        }
-
-        .navbar__link {
-          font-family: var(--font-helvetica);
-          font-size: 0.75rem;
-          font-weight: 400;
-          letter-spacing: 0.18em;
-          text-transform: uppercase;
-          color: var(--color-text-muted);
-          text-decoration: none;
-          position: relative;
-          padding-bottom: 2px;
-          transition: color 0.3s var(--ease-mechanical);
-        }
-
-        /* Mechanical underline effect */
-        .navbar__link::after {
-          content: "";
-          position: absolute;
-          bottom: 0;
-          left: 0;
-          width: 0;
-          height: 1px;
-          background: var(--gradient-silver);
-          transition: width 0.35s var(--ease-mechanical);
-        }
-
-        .navbar__link:hover {
-          color: var(--color-text);
-        }
-
-        .navbar__link:hover::after {
-          width: 100%;
         }
       `}</style>
     </header>

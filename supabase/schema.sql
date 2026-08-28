@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS projects (
   category      text,
   year          integer,
   description   text,
-  content_md    text,             -- Full case study in Markdown
+  content_json  jsonb DEFAULT '{}'::jsonb, -- Rich text content (TipTap JSON)
   hero_image_url text,            -- AVIF URL dari Cloudflare R2 CDN
   gallery_urls  text[],           -- Array of additional R2 CDN URLs
   tags          text[],
@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS articles (
   slug          text UNIQUE NOT NULL,
   title         text NOT NULL,
   excerpt       text,
-  content_md    text NOT NULL,    -- Full article in Markdown
+  content_json  jsonb DEFAULT '{}'::jsonb NOT NULL, -- Rich text content (TipTap JSON)
   cover_image_url text,           -- AVIF URL dari Cloudflare R2 CDN
   published_at  timestamptz,
   reading_time  integer,          -- Estimated reading time in minutes

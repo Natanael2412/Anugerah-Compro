@@ -1,15 +1,18 @@
 import Link from "next/link";
-import { projects } from "@/lib/data/projects";
-import { articles } from "@/lib/data/articles";
+import { getAllProjects } from "@/lib/data/projects";
+import { getAllArticles } from "@/lib/data/articles";
 import AdminNav from "@/components/admin/AdminNav";
 
-const CARDS = [
-  { label: "Projects", count: projects.length, href: "/admin/projects", cta: "Manage" },
-  { label: "Articles", count: articles.length, href: "/admin/articles", cta: "Manage" },
-  { label: "Published", count: projects.filter((p) => p.index > 0).length, href: "/admin/projects", cta: "View" },
-];
+export default async function AdminDashboardPage() {
+  const projects = await getAllProjects();
+  const articles = await getAllArticles();
 
-export default function AdminDashboardPage() {
+  const CARDS = [
+    { label: "Projects", count: projects.length, href: "/admin/projects", cta: "Manage" },
+    { label: "Articles", count: articles.length, href: "/admin/articles", cta: "Manage" },
+    { label: "Published", count: projects.filter((p) => p.is_av_published).length, href: "/admin/projects", cta: "View" },
+  ];
+
   return (
     <div style={{ minHeight: "100vh", background: "var(--color-base)" }}>
       <AdminNav />

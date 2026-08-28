@@ -5,6 +5,7 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import Link from "next/link";
 import type { Project } from "@/lib/data/projects";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -295,11 +296,31 @@ export default function HorizontalShowcase({ projects }: HorizontalShowcaseProps
     >
       {/* Section header */}
       <div className="showcase-header">
-        <p className="showcase-label" aria-hidden="true">
-          <span className="showcase-label-num">02</span>
-          <span className="showcase-label-divider" aria-hidden="true" />
-          Selected Work
-        </p>
+        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+          <p className="showcase-label" aria-hidden="true">
+            <span className="showcase-label-num">02</span>
+            <span className="showcase-label-divider" aria-hidden="true" />
+            Selected Work
+          </p>
+          <Link
+            href="/work"
+            style={{
+              fontFamily: "var(--font-helvetica)",
+              fontSize: "0.75rem",
+              letterSpacing: "0.15em",
+              textTransform: "uppercase",
+              color: "var(--color-silver)",
+              textDecoration: "none",
+              borderBottom: "1px solid rgba(192,192,192,0.3)",
+              paddingBottom: "4px",
+              width: "fit-content",
+              transition: "all 0.3s ease",
+            }}
+            className="view-all-link"
+          >
+            View All Projects →
+          </Link>
+        </div>
         <p className="showcase-scroll-hint" aria-hidden="true">
           Scroll to explore ↓
         </p>
@@ -395,6 +416,11 @@ export default function HorizontalShowcase({ projects }: HorizontalShowcaseProps
           letter-spacing: 0.2em;
           text-transform: uppercase;
           color: var(--color-text-subtle);
+        }
+
+        .view-all-link:hover {
+          color: var(--color-text);
+          border-bottom-color: var(--color-text);
         }
 
         /* Hidden scroll driver — purely for TanStack Virtual measurement */

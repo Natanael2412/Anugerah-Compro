@@ -5,6 +5,7 @@ import "./globals.css";
 import GrainShaderClient from "@/components/canvas/GrainShaderClient";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import ToastProvider from "@/components/ui/ToastProvider";
 
 
 /* ============================================================
@@ -98,22 +99,24 @@ export default function RootLayout({
         />
       </head>
       <body>
-        {/*
-          Layer 0: WebGL grain shader — position:fixed, z-index:-1
-          Loaded dynamically (client-only), falls back to CSS base color (#0C1F20) during SSR.
-        */}
-        <GrainShaderClient />
+        <ToastProvider>
+          {/*
+            Layer 0: WebGL grain shader — position:fixed, z-index:-1
+            Loaded dynamically (client-only), falls back to CSS base color (#0C1F20) during SSR.
+          */}
+          <GrainShaderClient />
 
-        {/* Global navigation */}
-        <Navbar />
+          {/* Global navigation */}
+          <Navbar />
 
-        {/* Page content */}
-        <main id="main-content" role="main">
-          {children}
-        </main>
+          {/* Page content */}
+          <main id="main-content" role="main">
+            {children}
+          </main>
 
-        {/* Global footer */}
-        <Footer />
+          {/* Global footer */}
+          <Footer />
+        </ToastProvider>
       </body>
     </html>
   );
