@@ -144,7 +144,7 @@ export default function CurtainedNarrative() {
           display: flex;
           flex-direction: column;
           justify-content: center;
-          padding: 0 clamp(1.5rem, 8vw, 9rem);
+          padding: 0 var(--page-margin);
           z-index: 2;
         }
 

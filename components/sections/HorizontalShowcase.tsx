@@ -380,7 +380,7 @@ export default function HorizontalShowcase({ projects }: HorizontalShowcaseProps
           display: flex;
           justify-content: space-between;
           align-items: flex-end;
-          padding: 0 clamp(1.5rem, 4vw, 3rem);
+          padding: 0 var(--page-margin);
           margin-bottom: clamp(2rem, 4vh, 3rem);
           flex-shrink: 0;
         }
@@ -439,7 +439,7 @@ export default function HorizontalShowcase({ projects }: HorizontalShowcaseProps
           display: flex;
           align-items: center;
           height: calc(100vh - 8rem);
-          padding: 0 clamp(1.5rem, 4vw, 3rem);
+          padding: 0 var(--page-margin);
           will-change: transform;
           flex-shrink: 0;
         }

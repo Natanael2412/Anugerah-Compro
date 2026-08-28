@@ -80,7 +80,7 @@ export default function Footer() {
           align-items: flex-end;
           max-width: 1400px;
           margin: 0 auto;
-          padding: 0 clamp(1.25rem, 4vw, 3rem);
+          padding: 0 var(--page-margin);
           gap: 2rem;
           flex-wrap: wrap;
         }
@@ -174,7 +174,7 @@ export default function Footer() {
         .footer__rule {
           max-width: 1400px;
           margin: 2rem auto 0;
-          padding: 0 clamp(1.25rem, 4vw, 3rem);
+          padding: 0 var(--page-margin);
           height: 1px;
           background: rgba(192, 192, 192, 0.06);
         }

@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 /* ============================================================
    ANUGERAH VENTURES — GLOBAL DESIGN SYSTEM
@@ -32,6 +33,7 @@
 
   /* Spacing & Layout */
   --nav-height: 64px;
+  --page-margin: clamp(1.5rem, 8vw, 12rem);
 
   /* Timing functions */
   --ease-mechanical: cubic-bezier(0.16, 1, 0.3, 1);

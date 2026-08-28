@@ -24,8 +24,8 @@ export default async function WorkPage() {
         style={{
           paddingTop: "calc(var(--nav-height, 64px) + 6vh)",
           paddingBottom: "4vh",
-          paddingLeft: "clamp(1.5rem, 8vw, 9rem)",
-          paddingRight: "clamp(1.5rem, 8vw, 9rem)",
+          paddingLeft: "var(--page-margin)",
+          paddingRight: "var(--page-margin)",
           borderBottom: "1px solid rgba(192,192,192,0.07)",
           background: "var(--color-surface)",
         }}
@@ -76,7 +76,7 @@ export default async function WorkPage() {
         style={{
           maxWidth: "1400px",
           margin: "0 auto",
-          padding: "clamp(3rem, 6vh, 5rem) clamp(1.5rem, 8vw, 9rem)",
+          padding: "clamp(3rem, 6vh, 5rem) var(--page-margin)",
         }}
       >
         <WorkGrid projects={projects} />

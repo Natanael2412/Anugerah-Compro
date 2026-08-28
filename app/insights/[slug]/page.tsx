@@ -1,14 +1,14 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { getArticleBySlug, getPublishedArticles } from "@/lib/data/articles";
+import Image from "next/image";
+import Link from "next/link";
+import { getArticleBySlug } from "@/lib/data/articles";
 import ReadingProgress from "@/components/article/ReadingProgress";
 import RichTextRenderer from "@/components/editor/RichTextRenderer";
 
 interface Props {
   params: Promise<{ slug: string }>;
 }
-
-
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
@@ -42,7 +42,7 @@ export default async function InsightDetailPage({ params }: Props) {
   const { slug } = await params;
   const article = await getArticleBySlug(slug);
 
-  if (!article) notFound();
+  if (!article || !article.is_av_published) notFound();
 
   // ── JSON-LD Schema.org — BlogPosting ──────────────────────
   const jsonLd = {
@@ -67,136 +67,80 @@ export default async function InsightDetailPage({ params }: Props) {
       "@id": `${process.env.NEXT_PUBLIC_SITE_URL ?? "https://anugerahventures.id"}/insights/${article.slug}`,
     },
     ...(article.cover_image_url && { image: article.cover_image_url }),
-    keywords: article.tags.join(", "),
+    keywords: article.tags?.join(", "),
     inLanguage: "id-ID",
-    articleSection: article.tags[0] ?? "Insights",
+    articleSection: article.tags?.[0] ?? "Insights",
   };
 
   return (
     <>
-      {/* JSON-LD */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      {/* Reading progress bar (GSAP, client) */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <ReadingProgress articleId="article-body" />
 
-      <div style={{ minHeight: "100vh" }}>
-
-        {/* Article header */}
-        <header
-          style={{
-            paddingTop: "calc(var(--nav-height, 64px) + 6vh)",
-            paddingBottom: "4vh",
-            paddingLeft: "clamp(1.5rem, 8vw, 9rem)",
-            paddingRight: "clamp(1.5rem, 8vw, 9rem)",
-            background: "var(--color-surface)",
-            borderBottom: "1px solid rgba(192,192,192,0.07)",
-          }}
-        >
-          {/* Tags */}
-          <div style={{ display: "flex", gap: "1rem", marginBottom: "1.5rem", flexWrap: "wrap" }}>
-            {article.tags.map((tag) => (
-              <span
-                key={tag}
-                style={{
-                  fontFamily: "var(--font-helvetica)",
-                  fontSize: "0.62rem",
-                  letterSpacing: "0.2em",
-                  textTransform: "uppercase",
-                  color: "var(--color-silver)",
-                }}
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-
-          {/* Cover image */}
-          {article.cover_image_url && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+      <div style={{ minHeight: "100vh", background: "var(--color-surface)" }}>
+        
+        {/* ── HIGH-END EDITORIAL HERO SECTION ── */}
+        <section className="relative w-full h-[70vh] flex items-end">
+          {/* Cover Image Background */}
+          {article.cover_image_url ? (
+            <Image
               src={article.cover_image_url}
               alt={article.title}
-              style={{
-                width: "100%",
-                maxHeight: "420px",
-                objectFit: "cover",
-                borderRadius: "2px",
-                marginBottom: "2rem",
-              }}
+              fill
+              priority
+              className="object-cover z-0"
+              sizes="100vw"
             />
+          ) : (
+            <div className="absolute inset-0 bg-[#0c1f20] z-0" />
           )}
 
-          {/* Title */}
-          <h1
-            style={{
-              fontFamily: "var(--font-helvetica)",
-              fontSize: "clamp(1.8rem, 4vw, 3.5rem)",
-              fontWeight: 300,
-              letterSpacing: "-0.02em",
-              lineHeight: 1.2,
-              color: "var(--color-text)",
-              maxWidth: "860px",
-              marginBottom: "1.5rem",
-            }}
-          >
-            {article.title}
-          </h1>
+          {/* Gradient Scrim */}
+          <div className="absolute inset-0 z-10 bg-gradient-to-t from-[#051011] via-[#051011]/60 to-transparent pointer-events-none" />
 
-          {/* Meta */}
-          <div style={{ display: "flex", gap: "1.5rem", alignItems: "center" }}>
-            <time
-              dateTime={article.published_at}
-              style={{ fontFamily: "var(--font-helvetica)", fontSize: "0.7rem", letterSpacing: "0.12em", color: "var(--color-text-subtle)" }}
+          {/* Overlay Content */}
+          <div className="relative z-20 w-full p-8 md:p-12 max-w-5xl">
+            {/* Breadcrumb Back Link */}
+            <Link
+              href="/"
+              className="group inline-flex items-center text-xs font-helvetica tracking-[0.2em] uppercase text-silver hover:text-white transition-colors mb-6"
             >
-              {formatDate(article.published_at)}
-            </time>
-            <span style={{ color: "var(--color-text-subtle)", fontSize: "0.7rem" }}>·</span>
-            <span style={{ fontFamily: "var(--font-helvetica)", fontSize: "0.7rem", letterSpacing: "0.12em", color: "var(--color-text-subtle)" }}>
-              {article.reading_time || 0} menit baca
-            </span>
+              <span className="mr-2 opacity-50 group-hover:-translate-x-1 transition-transform duration-300">←</span>
+              <span className="relative">
+                Back to Studio
+                <span className="absolute left-0 bottom-[-4px] w-0 h-[1px] bg-silver transition-all duration-300 group-hover:w-full"></span>
+              </span>
+            </Link>
+
+            {/* Title */}
+            <h1 className="font-helvetica font-light text-[#F8F9FA] text-4xl md:text-5xl lg:text-6xl tracking-tight leading-[1.1] mb-6">
+              {article.title}
+            </h1>
+
+            {/* Meta */}
+            <div className="flex flex-wrap items-center gap-4 text-xs font-helvetica tracking-[0.1em] uppercase text-silver/70">
+              <span>Anugerah Ventures</span>
+              <span>·</span>
+              <time dateTime={article.published_at}>{formatDate(article.published_at)}</time>
+              <span>·</span>
+              <span>{article.reading_time || 0} MIN READ</span>
+            </div>
           </div>
-        </header>
+        </section>
 
-        {/* ── ARTICLE BODY ─────────────────────────────────── */}
-        <article
-          id="article-body"
-          style={{
-            maxWidth: "65ch",
-            margin: "0 auto",
-            padding: "clamp(3rem, 7vh, 5rem) clamp(1.5rem, 4vw, 2rem)",
-          }}
-        >
-          {/* RichTextRenderer: TipTap JSON → HTML, zero client JS */}
-          <RichTextRenderer content={article.content_json} className="prose-av" />
-        </article>
-
-        {/* Bottom nav */}
-        <div
-          style={{
-            maxWidth: "65ch",
-            margin: "0 auto",
-            padding: "2rem clamp(1.5rem, 4vw, 2rem) 6rem",
-            borderTop: "1px solid rgba(192,192,192,0.07)",
-          }}
-        >
-          <a
-            href="/insights"
-            style={{
-              fontFamily: "var(--font-helvetica)",
-              fontSize: "0.7rem",
-              letterSpacing: "0.2em",
-              textTransform: "uppercase",
-              color: "var(--color-silver)",
-              textDecoration: "none",
-            }}
+        {/* ── CONTENT SECTION (BELOW THE FOLD) ── */}
+        <section className="w-full bg-[#051011]">
+          <article
+            id="article-body"
+            className="max-w-3xl mx-auto py-16 px-6 md:px-4"
           >
-            ← All Insights
-          </a>
-        </div>
+            <RichTextRenderer
+              content={article.content_json}
+              className="prose prose-invert prose-lg max-w-none text-[#F8F9FA] prose-headings:font-helvetica prose-headings:text-white prose-headings:font-light prose-a:text-silver hover:prose-a:text-white prose-a:transition-colors prose-img:rounded-lg prose-img:mx-auto prose-img:shadow-xl prose-hr:border-silver/10 prose-blockquote:border-silver prose-blockquote:text-silver/80"
+            />
+          </article>
+        </section>
+
       </div>
     </>
   );

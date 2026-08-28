@@ -9,12 +9,15 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@ai-sdk/google": "^4.0.56",
     "@aws-sdk/client-s3": "^3.1117.0",
     "@gsap/react": "^2.1.1",
+    "@hookform/resolvers": "^5.9.1",
     "@react-three/drei": "^10.3.6",
     "@react-three/fiber": "^9.1.2",
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.50.3",
+    "@tailwindcss/typography": "^0.5.20",
     "@tanstack/react-virtual": "^3.13.9",
     "@tiptap/extension-link": "^3.30.5",
     "@tiptap/extension-placeholder": "^3.30.5",
@@ -22,13 +25,16 @@
     "@tiptap/pm": "^3.30.5",
     "@tiptap/react": "^3.30.5",
     "@tiptap/starter-kit": "^3.30.5",
+    "ai": "^7.0.83",
     "gsap": "^3.12.5",
     "next": "^16.3.2",
     "next-mdx-remote": "^6.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-hook-form": "^7.86.0",
     "sharp": "^0.33.5",
-    "three": "^0.177.0"
+    "three": "^0.177.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

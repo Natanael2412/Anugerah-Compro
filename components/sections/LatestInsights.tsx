@@ -15,7 +15,7 @@ export default function LatestInsights({ articles }: Props) {
     <section
       id="insights"
       style={{
-        padding: "clamp(4rem, 8vh, 8rem) clamp(1.5rem, 8vw, 9rem)",
+        padding: "clamp(4rem, 8vh, 8rem) var(--page-margin)",
         background: "var(--color-base)",
         position: "relative",
       }}

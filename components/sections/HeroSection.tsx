@@ -140,7 +140,7 @@ export default function HeroSection() {
         style={{
           position: "absolute",
           bottom: "clamp(1.5rem, 4vh, 3rem)",
-          left: "clamp(1.5rem, 8vw, 9rem)",
+          left: "var(--page-margin)",
           display: "flex",
           flexDirection: "column",
           alignItems: "flex-start",
