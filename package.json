@@ -9,8 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@ai-sdk/google": "^4.0.56",
-    "@ai-sdk/react": "^4.0.86",
+    "@ai-sdk/google": "^0.0.52",
     "@aws-sdk/client-s3": "^3.1117.0",
     "@gsap/react": "^2.1.1",
     "@hookform/resolvers": "^5.9.1",
@@ -26,8 +25,9 @@
     "@tiptap/pm": "^3.30.5",
     "@tiptap/react": "^3.30.5",
     "@tiptap/starter-kit": "^3.30.5",
-    "ai": "^7.0.83",
+    "ai": "^3.4.33",
     "gsap": "^3.12.5",
+    "happy-dom": "^20.11.15",
     "next": "^16.3.2",
     "next-mdx-remote": "^6.0.0",
     "react": "^19.0.0",

@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createPublicClient } from "@/lib/supabase/server";
 
 export type TiptapDoc = Record<string, unknown>;
 
@@ -37,7 +37,7 @@ export async function getAllArticles(): Promise<Article[]> {
  * Fetches only published articles for the frontend
  */
 export async function getPublishedArticles(): Promise<Article[]> {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data, error } = await supabase
     .from("articles")
     .select("*")
@@ -45,14 +45,14 @@ export async function getPublishedArticles(): Promise<Article[]> {
     .order("published_at", { ascending: false });
 
   if (error) {
-    console.error("[getPublishedArticles] Error:", error);
+    console.error("[getPublishedArticles] Error:", (error as any)?.message || error);
     return [];
   }
   return data as Article[];
 }
 
 export async function getArticleBySlug(slug: string): Promise<Article | undefined> {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data, error } = await supabase
     .from("articles")
     .select("*")

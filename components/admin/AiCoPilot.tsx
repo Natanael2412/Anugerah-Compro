@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { useChat } from "@ai-sdk/react";
+import { useChat } from "ai/react";
 import { useToast } from "@/components/ui/ToastProvider";
 
 interface AiCoPilotProps {
@@ -14,11 +14,9 @@ interface AiCoPilotProps {
 }
 
 export default function AiCoPilot({ onGenerateSuccess }: AiCoPilotProps) {
-  const { messages, sendMessage, status } = useChat({
+  const { messages, append, isLoading } = useChat({
     api: '/api/chat-brief'
   });
-  
-  const isLoading = status === "streaming" || status === "submitted";
   
   const [localInput, setLocalInput] = useState("");
   const [isGeneratingArticle, setIsGeneratingArticle] = useState(false);
@@ -56,7 +54,7 @@ export default function AiCoPilot({ onGenerateSuccess }: AiCoPilotProps) {
 
   const handleManualSubmit = () => {
     if (!localInput.trim() || isLoading || isGeneratingArticle) return;
-    sendMessage({ role: 'user', content: localInput });
+    append({ role: 'user', content: localInput });
     setLocalInput("");
   };
 

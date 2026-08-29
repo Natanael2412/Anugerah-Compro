@@ -10,29 +10,29 @@ interface Props {
 
 export default function WorkGrid({ projects }: Props) {
   const [search, setSearch] = useState("");
-  const [activeCategory, setActiveCategory] = useState<string>("All");
+  const [activeRole, setActiveRole] = useState<string>("All");
 
-  // Collect unique categories
-  const categories = useMemo(() => {
-    const cats = new Set<string>();
-    projects.forEach((p) => { if (p.category) cats.add(p.category); });
-    return ["All", ...Array.from(cats)];
+  // Collect unique roles
+  const roles = useMemo(() => {
+    const rls = new Set<string>();
+    projects.forEach((p) => { if (p.role) rls.add(p.role); });
+    return ["All", ...Array.from(rls)];
   }, [projects]);
 
   // Filter
   const filtered = useMemo(() => {
     const q = search.toLowerCase().trim();
     return projects.filter((p) => {
-      const matchCat = activeCategory === "All" || p.category === activeCategory;
+      const matchRole = activeRole === "All" || p.role === activeRole;
       const matchSearch =
         !q ||
         p.title.toLowerCase().includes(q) ||
         p.description?.toLowerCase().includes(q) ||
-        p.tags?.some((t) => t.toLowerCase().includes(q)) ||
-        p.category?.toLowerCase().includes(q);
-      return matchCat && matchSearch;
+        p.tech_stack?.some((t: string) => t.toLowerCase().includes(q)) ||
+        p.role?.toLowerCase().includes(q);
+      return matchRole && matchSearch;
     });
-  }, [projects, search, activeCategory]);
+  }, [projects, search, activeRole]);
 
   return (
     <>
@@ -85,16 +85,16 @@ export default function WorkGrid({ projects }: Props) {
           />
         </div>
 
-        {/* Category filters */}
+        {/* Role filters */}
         <div
           role="group"
-          aria-label="Filter by category"
+          aria-label="Filter by role"
           style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}
         >
-          {categories.map((cat) => (
+          {roles.map((role) => (
             <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
+              key={role}
+              onClick={() => setActiveRole(role)}
               style={{
                 fontFamily: "var(--font-helvetica)",
                 fontSize: "0.6rem",
@@ -102,20 +102,20 @@ export default function WorkGrid({ projects }: Props) {
                 textTransform: "uppercase",
                 padding: "0.35rem 0.9rem",
                 borderRadius: "2px",
-                border: activeCategory === cat
+                border: activeRole === role
                   ? "1px solid rgba(192,192,192,0.5)"
                   : "1px solid rgba(192,192,192,0.12)",
-                background: activeCategory === cat
+                background: activeRole === role
                   ? "rgba(192,192,192,0.1)"
                   : "transparent",
-                color: activeCategory === cat
+                color: activeRole === role
                   ? "var(--color-text)"
                   : "var(--color-text-subtle)",
                 cursor: "pointer",
                 transition: "all 0.2s ease",
               }}
             >
-              {cat}
+              {role}
             </button>
           ))}
         </div>
@@ -130,7 +130,7 @@ export default function WorkGrid({ projects }: Props) {
           }}
         >
           {filtered.length} {filtered.length === 1 ? "project" : "projects"}
-          {activeCategory !== "All" && ` in ${activeCategory}`}
+          {activeRole !== "All" && ` in ${activeRole}`}
           {search && ` matching "${search}"`}
         </p>
       </div>
@@ -304,7 +304,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
                   color: "var(--color-silver)",
                 }}
               >
-                {project.category}
+                {project.role}
               </span>
               <span
                 style={{
@@ -362,7 +362,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
               }}
             >
               <div style={{ display: "flex", gap: "0.35rem", flexWrap: "wrap" }}>
-                {project.tags?.slice(0, 2).map((tag) => (
+                {project.tech_stack?.slice(0, 2).map((tag: string) => (
                   <span
                     key={tag}
                     style={{

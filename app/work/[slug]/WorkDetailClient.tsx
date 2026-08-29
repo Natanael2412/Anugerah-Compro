@@ -50,7 +50,7 @@ export default function WorkDetailClient({ project }: Props) {
               color: "var(--color-silver)",
             }}
           >
-            {project.category}
+            {project.role}
           </span>
           <span
             style={{
@@ -89,7 +89,7 @@ export default function WorkDetailClient({ project }: Props) {
             marginTop: "2rem",
           }}
         >
-          {project.tags.map((tag) => (
+          {project.tech_stack?.map((tag: string) => (
             <li
               key={tag}
               style={{

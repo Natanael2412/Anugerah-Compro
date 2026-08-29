@@ -40,13 +40,13 @@ const fieldStyle: React.CSSProperties = { marginBottom: "1.5rem" };
 const articleSchema = z.object({
   title: z.string().min(1, "Title is required"),
   slug: z.string().min(1, "Slug is required"),
-  excerpt: z.string().max(160, "Excerpt must be 160 characters or less").optional().default(""),
-  tags: z.string().optional().default(""),
-  readingTime: z.string().default("5"),
+  excerpt: z.string().max(160, "Excerpt must be 160 characters or less").optional(),
+  tags: z.string().optional(),
+  readingTime: z.string(),
   publishedAt: z.string().optional(),
-  is_av_published: z.boolean().default(false),
-  is_personal_published: z.boolean().default(false),
-  cover_image_url: z.string().optional().default(""),
+  is_av_published: z.boolean(),
+  is_personal_published: z.boolean(),
+  cover_image_url: z.string().optional(),
 });
 
 type ArticleFormValues = z.infer<typeof articleSchema>;

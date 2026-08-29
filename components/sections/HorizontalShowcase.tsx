@@ -56,7 +56,7 @@ function ProjectCard({ project }: { project: Project }) {
       {/* Card content */}
       <div className="card-body">
         <div className="card-meta">
-          <span className="card-category">{project.category}</span>
+          <span className="card-category">{project.role}</span>
           <span className="card-year">{project.year}</span>
         </div>
 
@@ -65,7 +65,7 @@ function ProjectCard({ project }: { project: Project }) {
         <p className="card-description">{project.description}</p>
 
         <ul className="card-tags" aria-label="Technologies">
-          {project.tags.map((tag) => (
+          {project.tech_stack?.map((tag: string) => (
             <li key={tag} className="card-tag">
               {tag}
             </li>

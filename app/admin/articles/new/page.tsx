@@ -40,10 +40,10 @@ const articleSchema = z.object({
   slug: z.string().min(1, "Slug is required"),
   excerpt: z.string().max(160, "Excerpt must be 160 characters or less").optional(),
   tags: z.string().optional(),
-  readingTime: z.string().default("5"),
+  readingTime: z.string(),
   publishedAt: z.string().optional(),
-  is_av_published: z.boolean().default(false),
-  is_personal_published: z.boolean().default(false),
+  is_av_published: z.boolean(),
+  is_personal_published: z.boolean(),
   cover_image_url: z.string().optional(),
 });
 

@@ -1,22 +1,8 @@
-import { createClient } from "@/lib/supabase/server";
-import type { TiptapDoc } from "./articles";
+import { createClient, createPublicClient } from "@/lib/supabase/server";
+import { type Project, type ProjectInsert, projectSchema } from "./projectSchema";
 
-export interface Project {
-  id: string;
-  slug: string;
-  title: string;
-  category: string;
-  year: number;
-  description: string;
-  tags: string[];
-  /** Index used for decorative Citadel numbering */
-  index?: number;
-  hero_image_url?: string;
-  gallery_urls?: string[];
-  content_json?: TiptapDoc;
-  is_av_published: boolean;
-  is_personal_published?: boolean;
-}
+export type { Project, ProjectInsert };
+export { projectSchema };
 
 /**
  * Fetches ALL projects for Admin Dashboard (includes drafts)
@@ -39,7 +25,7 @@ export async function getAllProjects(): Promise<Project[]> {
  * Fetches only published projects for the frontend
  */
 export async function getPublishedProjects(): Promise<Project[]> {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data, error } = await supabase
     .from("projects")
     .select("*")
@@ -47,14 +33,14 @@ export async function getPublishedProjects(): Promise<Project[]> {
     .order("sort_order", { ascending: true });
 
   if (error) {
-    console.error("[getPublishedProjects] Error:", error);
+    console.error("[getPublishedProjects] Error:", (error as any)?.message || error);
     return [];
   }
   return data as Project[];
 }
 
 export async function getProjectBySlug(slug: string): Promise<Project | undefined> {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data, error } = await supabase
     .from("projects")
     .select("*")

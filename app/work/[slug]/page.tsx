@@ -20,10 +20,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   return {
     title: project.title,
-    description: project.description,
+    description: project.description ?? undefined,
     openGraph: {
       title: `${project.title} — Anugerah Ventures`,
-      description: project.description,
+      description: project.description ?? undefined,
       type: "article",
     },
   };
@@ -51,7 +51,7 @@ export default async function WorkDetailPage({ params }: Props) {
       name: "Anugerah Ventures",
       url: BASE_URL,
     },
-    keywords: project.tags?.join(", "),
+    keywords: project.tech_stack?.join(", "),
     ...(project.hero_image_url && { image: project.hero_image_url }),
   };
 

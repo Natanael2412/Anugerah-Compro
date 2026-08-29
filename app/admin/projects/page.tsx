@@ -49,7 +49,7 @@ export default async function AdminProjectsPage() {
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr style={{ borderBottom: "1px solid rgba(192,192,192,0.1)" }}>
-                {["Title", "Category", "Year", "Tags", "Status", "Actions"].map((h) => (
+                {["Title", "Role", "Year", "Tech Stack", "Status", "Actions"].map((h) => (
                   <th
                     key={h}
                     style={{
@@ -78,7 +78,7 @@ export default async function AdminProjectsPage() {
                   </td>
                   <td style={{ padding: "1rem", verticalAlign: "middle" }}>
                     <span style={{ fontFamily: "var(--font-helvetica)", fontSize: "0.75rem", color: "var(--color-silver)" }}>
-                      {project.category}
+                      {project.role}
                     </span>
                   </td>
                   <td style={{ padding: "1rem", verticalAlign: "middle" }}>
@@ -88,7 +88,7 @@ export default async function AdminProjectsPage() {
                   </td>
                   <td style={{ padding: "1rem", verticalAlign: "middle" }}>
                     <div style={{ display: "flex", gap: "0.4rem" }}>
-                      {project.tags?.slice(0, 2).map((t) => (
+                      {project.tech_stack?.slice(0, 2).map((t: string) => (
                         <span key={t} style={{ fontFamily: "var(--font-helvetica)", fontSize: "0.6rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--color-text-subtle)", border: "1px solid rgba(192,192,192,0.1)", padding: "0.15rem 0.4rem", borderRadius: "2px" }}>
                           {t}
                         </span>
