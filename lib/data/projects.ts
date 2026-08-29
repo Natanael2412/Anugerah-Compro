@@ -18,7 +18,7 @@ export async function getAllProjects(): Promise<Project[]> {
     console.error("[getAllProjects] Error:", error);
     return [];
   }
-  return data as Project[];
+  return data.map((p, i) => ({ ...p, index: i + 1 })) as Project[];
 }
 
 /**
@@ -36,7 +36,7 @@ export async function getPublishedProjects(): Promise<Project[]> {
     console.error("[getPublishedProjects] Error:", (error as any)?.message || error);
     return [];
   }
-  return data as Project[];
+  return data.map((p, i) => ({ ...p, index: i + 1 })) as Project[];
 }
 
 export async function getProjectBySlug(slug: string): Promise<Project | undefined> {

@@ -109,7 +109,7 @@ export default function WorkDetailClient({ project }: Props) {
         </ul>
       </header>
 
-      {/* ── HERO IMAGE PLACEHOLDER ───────────────────────────── */}
+      {/* ── HERO IMAGE ───────────────────────────── */}
       <div
         role="img"
         aria-label={`Hero image for ${project.title}`}
@@ -124,37 +124,52 @@ export default function WorkDetailClient({ project }: Props) {
           overflow: "hidden",
         }}
       >
-        {/* Decorative index */}
-        <span
-          aria-hidden="true"
-          style={{
-            fontFamily: "var(--font-citadel)",
-            fontSize: "clamp(8rem, 20vw, 18rem)",
-            fontWeight: 700,
-            fontStyle: "italic",
-            background: "var(--gradient-silver)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            backgroundClip: "text",
-            opacity: 0.08,
-            userSelect: "none",
-            lineHeight: 1,
-          }}
-        >
-          {String(project.index).padStart(2, "0")}
-        </span>
-        <p
-          style={{
-            position: "absolute",
-            fontFamily: "var(--font-helvetica)",
-            fontSize: "0.65rem",
-            letterSpacing: "0.2em",
-            textTransform: "uppercase",
-            color: "var(--color-text-subtle)",
-          }}
-        >
-          Hero image — Phase 4 (Supabase Storage)
-        </p>
+        {project.hero_image_url ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img 
+            src={project.hero_image_url} 
+            alt={project.title}
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+            }}
+          />
+        ) : (
+          <>
+            {/* Decorative index placeholder */}
+            <span
+              aria-hidden="true"
+              style={{
+                fontFamily: "var(--font-citadel)",
+                fontSize: "clamp(8rem, 20vw, 18rem)",
+                fontWeight: 700,
+                fontStyle: "italic",
+                background: "var(--gradient-silver)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+                opacity: 0.08,
+                userSelect: "none",
+                lineHeight: 1,
+              }}
+            >
+              {String(project.index || "AV").padStart(2, "0")}
+            </span>
+            <p
+              style={{
+                position: "absolute",
+                fontFamily: "var(--font-helvetica)",
+                fontSize: "0.65rem",
+                letterSpacing: "0.2em",
+                textTransform: "uppercase",
+                color: "var(--color-text-subtle)",
+              }}
+            >
+              No Hero Image
+            </p>
+          </>
+        )}
       </div>
 
       {/* ── MAIN CONTENT GRID ───────────────────────────────── */}

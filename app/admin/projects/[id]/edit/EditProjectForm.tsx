@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import AdminNav from "@/components/admin/AdminNav";
 import GalleryDropzone from "@/components/admin/GalleryDropzone";
+import RoleManager from "@/components/admin/RoleManager";
+import ProjectAiCopilot from "@/components/admin/ProjectAiCopilot";
 import { useToast } from "@/components/ui/ToastProvider";
 import { projectSchema } from "@/lib/data/projectSchema";
 import { updateProject } from "@/lib/actions";
@@ -30,7 +32,8 @@ export default function EditProjectForm({ project }: { project: Project }) {
   const [imageUploading, setImageUploading] = useState(false);
   const [heroImageUrl, setHeroImageUrl] = useState(project.hero_image_url || "");
   const [galleryUrls, setGalleryUrls] = useState<string[]>(project.gallery_urls || []);
-  
+  const [error, setError] = useState<string | null>(null);
+
   const [form, setForm] = useState({
     title: project.title || "",
     slug: project.slug || "",
@@ -46,7 +49,27 @@ export default function EditProjectForm({ project }: { project: Project }) {
 
   function updateForm(key: string, value: string | boolean) {
     setForm((prev) => ({ ...prev, [key]: value }));
+    if (key === "title" && typeof value === "string") {
+      setForm((prev) => ({
+        ...prev,
+        title: value,
+        slug: value.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, ""),
+      }));
+    }
   }
+
+  const handleAiAccept = (data: any) => {
+    setForm(prev => ({
+      ...prev,
+      title: data.title || prev.title,
+      slug: data.slug || prev.slug,
+      client: data.client || prev.client,
+      role: data.role || prev.role,
+      tech_stack: data.tech_stack ? data.tech_stack.join(", ") : prev.tech_stack,
+      year: data.year ? String(data.year) : prev.year,
+      description: data.description || prev.description,
+    }));
+  };
 
   async function handleImageUpload() {
     if (!imageFile) return;
@@ -87,11 +110,13 @@ export default function EditProjectForm({ project }: { project: Project }) {
 
     if (!validationResult.success) {
       const errorMsg = validationResult.error.issues.map((err: any) => err.message).join(", ");
-      showToast(`Validation Error: ${errorMsg}`, "error");
+      setError(`Validation Error: ${errorMsg}`);
       return;
     }
 
     setLoading(true);
+    setError(null);
+
     try {
       await updateProject(project.id, validationResult.data);
       showToast("Proyek berhasil disimpan!", "success");
@@ -108,16 +133,17 @@ export default function EditProjectForm({ project }: { project: Project }) {
       <AdminNav />
       <main style={{ maxWidth: "1200px", margin: "0 auto", padding: "calc(var(--nav-height, 64px) + 3rem) clamp(1.5rem, 4vw, 3rem) 4rem" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "2.5rem" }}>
-          <div>
-            <p style={{ fontFamily: "var(--font-citadel)", fontSize: "0.75rem", fontStyle: "italic", color: "var(--color-silver)", marginBottom: "0.4rem" }}>Edit</p>
-            <h1 style={{ fontFamily: "var(--font-helvetica)", fontSize: "clamp(1.4rem, 2.5vw, 2rem)", fontWeight: 300, color: "var(--color-text)", letterSpacing: "-0.01em" }}>
-              {project.title}
-            </h1>
-          </div>
+          <h1 style={{ fontSize: "1.5rem", fontWeight: "bold", fontFamily: "var(--font-helvetica)", letterSpacing: "-0.02em", marginBottom: "2rem" }}>
+            Edit Project: {project.title}
+          </h1>
           <button type="button" onClick={() => router.back()} style={{ fontFamily: "var(--font-helvetica)", fontSize: "0.65rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-text-subtle)", background: "none", border: "none", cursor: "pointer" }}>
             ← Back
           </button>
         </div>
+
+        <ProjectAiCopilot onAccept={handleAiAccept} />
+
+        {error && <div style={{ color: "red", marginBottom: "1rem", fontSize: "0.8rem" }}>{error}</div>}
 
         <form onSubmit={handleSubmit} style={{ display: "grid", gridTemplateColumns: "repeat(12, minmax(0, 1fr))", gap: "2rem" }}>
           
@@ -135,25 +161,10 @@ export default function EditProjectForm({ project }: { project: Project }) {
               </div>
               <div>
                 <label htmlFor="role" style={labelStyle}>Role</label>
-                <input 
-                  id="role" 
-                  list="role-options"
-                  value={form.role} 
-                  onChange={(e) => updateForm("role", e.target.value)} 
-                  style={inputStyle} 
-                  required 
+                <RoleManager 
+                  value={form.role}
+                  onChange={(val) => updateForm("role", val)}
                 />
-                <datalist id="role-options">
-                  <option value="Product Manager" />
-                  <option value="System Designer" />
-                  <option value="Product Owner" />
-                  <option value="Technical Architect" />
-                  <option value="Lead Software Engineer" />
-                  <option value="Engineering Manager" />
-                  <option value="Creative Digital Architect" />
-                  <option value="Lead Frontend Engineer" />
-                  <option value="Interactive Web Engineer" />
-                </datalist>
               </div>
             </div>
 
@@ -176,6 +187,7 @@ export default function EditProjectForm({ project }: { project: Project }) {
                 onChange={(e) => updateForm("description", e.target.value)} 
                 maxLength={500}
                 style={{ ...inputStyle, minHeight: "120px", resize: "vertical" }} 
+                placeholder="Technical showcase summary (max 500 characters)..." 
               />
               <div style={{ textAlign: "right", fontSize: "0.7rem", color: "var(--color-text-subtle)", marginTop: "0.25rem", fontFamily: "var(--font-helvetica)" }}>
                 {form.description.length} / 500

@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import AdminNav from "@/components/admin/AdminNav";
 import GalleryDropzone from "@/components/admin/GalleryDropzone";
+import RoleManager from "@/components/admin/RoleManager";
+import ProjectAiCopilot from "@/components/admin/ProjectAiCopilot";
 import { projectSchema } from "@/lib/data/projectSchema";
 
 const inputStyle: React.CSSProperties = {
@@ -38,6 +40,7 @@ export default function NewProjectPage() {
   const [imageUploading, setImageUploading] = useState(false);
   const [heroImageUrl, setHeroImageUrl] = useState("");
   const [galleryUrls, setGalleryUrls] = useState<string[]>([]);
+  const [error, setError] = useState<string | null>(null);
   
   const [form, setForm] = useState({
     title: "",
@@ -63,72 +66,69 @@ export default function NewProjectPage() {
     }
   }
 
+  const handleAiAccept = (data: any) => {
+    setForm(prev => ({
+      ...prev,
+      title: data.title || prev.title,
+      slug: data.slug || prev.slug,
+      client: data.client || prev.client,
+      role: data.role || prev.role,
+      tech_stack: data.tech_stack ? data.tech_stack.join(", ") : prev.tech_stack,
+      year: data.year ? String(data.year) : prev.year,
+      description: data.description || prev.description,
+    }));
+  };
+
   async function handleImageUpload() {
     if (!imageFile) return;
     setImageUploading(true);
     const formData = new FormData();
     formData.append("file", imageFile);
-    formData.append("folder", "projects/hero");
     try {
       const res = await fetch("/api/upload-image", { method: "POST", body: formData });
-      const data = await res.json();
-      if (data.url) setHeroImageUrl(data.url);
-      else throw new Error(data.error ?? "Upload failed");
-    } catch (err) {
-      console.error("Hero upload failed:", err);
-      alert("Image upload failed. Check console.");
+      if (!res.ok) throw new Error("Upload failed");
+      const { url } = await res.json();
+      setHeroImageUrl(url);
+    } catch (err: any) {
+      alert("Failed to upload image");
     } finally {
       setImageUploading(false);
     }
   }
 
-  async function handleSubmit(e: React.FormEvent) {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Parse tech_stack from comma-separated to array
-    const techStackArray = form.tech_stack
-      .split(",")
-      .map(t => t.trim())
-      .filter(Boolean);
+    setLoading(true);
+    setError(null);
 
-    // Validate using Zod schema
-    const validationResult = projectSchema.safeParse({
-      ...form,
-      year: Number(form.year),
-      tech_stack: techStackArray,
-      hero_image_url: heroImageUrl || null,
-      gallery_urls: galleryUrls,
-    });
+    const payload = { ...form, hero_image_url: heroImageUrl, gallery_urls: galleryUrls };
 
-    if (!validationResult.success) {
-      const errorMsg = validationResult.error.issues.map((err: any) => err.message).join(", ");
-      alert(`Validation Error: ${errorMsg}`);
+    const parsed = projectSchema.safeParse(payload);
+    if (!parsed.success) {
+      const msgs = parsed.error.issues.map(i => `${i.path.join(".")}: ${i.message}`);
+      setError(msgs.join(" | "));
+      setLoading(false);
       return;
     }
 
-    setLoading(true);
-
     try {
-      const { createClient } = await import("@/lib/supabase/client");
-      const supabase = createClient();
-
-      const { error } = await supabase.from("projects").insert({
-        ...validationResult.data,
-        sort_order: 0,
+      const res = await fetch("/api/projects", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(parsed.data),
       });
 
-      if (error) throw error;
+      if (!res.ok) throw new Error(await res.text());
       router.push("/admin/projects");
-    } catch (err) {
-      console.error("[NewProject] Save error:", err);
-      alert("Failed to save project. Check console for details.");
+    } catch (err: any) {
+      setError(err.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--color-base)" }}>
+    <div style={{ minHeight: "100vh", background: "var(--color-background)", color: "var(--color-text)" }}>
       <AdminNav />
 
       <main style={{ maxWidth: "1200px", margin: "0 auto", padding: "calc(var(--nav-height, 64px) + 3rem) clamp(1.5rem, 4vw, 3rem) 4rem" }}>
@@ -138,6 +138,10 @@ export default function NewProjectPage() {
             Add Project
           </h1>
         </div>
+
+        <ProjectAiCopilot onAccept={handleAiAccept} />
+
+        {error && <div style={{ color: "red", marginBottom: "1rem", fontSize: "0.8rem" }}>{error}</div>}
 
         <form onSubmit={handleSubmit} style={{ display: "grid", gridTemplateColumns: "repeat(12, minmax(0, 1fr))", gap: "2rem" }}>
           
@@ -156,26 +160,10 @@ export default function NewProjectPage() {
               
               <div>
                 <label htmlFor="role" style={labelStyle}>Role</label>
-                <input 
-                  id="role" 
-                  list="role-options"
-                  value={form.role} 
-                  onChange={(e) => updateForm("role", e.target.value)} 
-                  style={inputStyle} 
-                  required 
-                  placeholder="Select or type role..." 
+                <RoleManager 
+                  value={form.role}
+                  onChange={(val) => updateForm("role", val)}
                 />
-                <datalist id="role-options">
-                  <option value="Product Manager" />
-                  <option value="System Designer" />
-                  <option value="Product Owner" />
-                  <option value="Technical Architect" />
-                  <option value="Lead Software Engineer" />
-                  <option value="Engineering Manager" />
-                  <option value="Creative Digital Architect" />
-                  <option value="Lead Frontend Engineer" />
-                  <option value="Interactive Web Engineer" />
-                </datalist>
               </div>
             </div>
 
