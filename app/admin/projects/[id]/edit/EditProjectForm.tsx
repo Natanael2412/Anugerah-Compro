@@ -29,8 +29,8 @@ export default function EditProjectForm({ project }: { project: Project }) {
   const { showToast } = useToast();
   const [loading, setLoading] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imageUploading, setImageUploading] = useState(false);
   const [heroImageUrl, setHeroImageUrl] = useState(project.hero_image_url || "");
+  const [galleryFiles, setGalleryFiles] = useState<File[]>([]);
   const [galleryUrls, setGalleryUrls] = useState<string[]>(project.gallery_urls || []);
   const [error, setError] = useState<string | null>(null);
 
@@ -71,24 +71,15 @@ export default function EditProjectForm({ project }: { project: Project }) {
     }));
   };
 
-  async function handleImageUpload() {
-    if (!imageFile) return;
-    setImageUploading(true);
+  const uploadFile = async (file: File, folder: string) => {
     const formData = new FormData();
-    formData.append("file", imageFile);
-    formData.append("folder", "projects/hero");
-    try {
-      const res = await fetch("/api/upload-image", { method: "POST", body: formData });
-      const data = await res.json();
-      if (data.url) { setHeroImageUrl(data.url); showToast("Gambar berhasil diupload!", "success"); }
-      else throw new Error(data.error ?? "Upload failed");
-    } catch (err) {
-      console.error("Hero upload failed:", err);
-      showToast("Upload gambar gagal.", "error");
-    } finally {
-      setImageUploading(false);
-    }
-  }
+    formData.append("file", file);
+    formData.append("folder", folder);
+    const res = await fetch("/api/upload-image", { method: "POST", body: formData });
+    if (!res.ok) throw new Error(`Upload failed for ${file.name}`);
+    const data = await res.json();
+    return data.url;
+  };
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -99,23 +90,49 @@ export default function EditProjectForm({ project }: { project: Project }) {
       .map(t => t.trim())
       .filter(Boolean);
 
+    setLoading(true);
+    setError(null);
+
+    // First upload hero image if there is one
+    let finalHeroUrl = heroImageUrl;
+    if (imageFile) {
+      try {
+        finalHeroUrl = await uploadFile(imageFile, "projects/hero");
+      } catch (err: any) {
+        setError(`Hero image upload failed: ${err.message}`);
+        setLoading(false);
+        return;
+      }
+    }
+
+    // Then upload new gallery files
+    const finalGalleryUrls = [...galleryUrls];
+    for (let i = 0; i < galleryFiles.length; i++) {
+      try {
+        const url = await uploadFile(galleryFiles[i], "projects/gallery");
+        finalGalleryUrls.push(url);
+      } catch (err: any) {
+        setError(`Gallery upload failed: ${err.message}`);
+        setLoading(false);
+        return;
+      }
+    }
+
     // Validate using Zod schema
     const validationResult = projectSchema.safeParse({
       ...form,
       year: Number(form.year),
       tech_stack: techStackArray,
-      hero_image_url: heroImageUrl || null,
-      gallery_urls: galleryUrls,
+      hero_image_url: finalHeroUrl || null,
+      gallery_urls: finalGalleryUrls,
     });
 
     if (!validationResult.success) {
       const errorMsg = validationResult.error.issues.map((err: any) => err.message).join(", ");
       setError(`Validation Error: ${errorMsg}`);
+      setLoading(false);
       return;
     }
-
-    setLoading(true);
-    setError(null);
 
     try {
       await updateProject(project.id, validationResult.data);
@@ -220,15 +237,10 @@ export default function EditProjectForm({ project }: { project: Project }) {
                 </p>
               )}
               <input id="hero-image" type="file" accept="image/jpeg,image/jpg,image/png,image/webp" onChange={(e) => setImageFile(e.target.files?.[0] ?? null)} style={{ fontFamily: "var(--font-helvetica)", fontSize: "0.8rem", color: "var(--color-text-subtle)", marginBottom: "1rem", display: "block", maxWidth: "100%" }} />
-              {imageFile && (
-                <button type="button" onClick={handleImageUpload} disabled={imageUploading} style={{ fontFamily: "var(--font-helvetica)", fontSize: "0.65rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-silver)", background: "none", border: "1px solid rgba(192,192,192,0.2)", padding: "0.5rem 1rem", borderRadius: "2px", cursor: "pointer" }}>
-                  {imageUploading ? "Uploading…" : "Upload"}
-                </button>
-              )}
             </div>
 
             <div style={fieldStyle}>
-              <GalleryDropzone onUploadSuccess={(urls) => setGalleryUrls(urls)} existingUrls={galleryUrls} />
+              <GalleryDropzone onChange={(files, urls) => { setGalleryFiles(files); setGalleryUrls(urls); }} existingUrls={galleryUrls} />
             </div>
 
             {/* Publish toggles */}

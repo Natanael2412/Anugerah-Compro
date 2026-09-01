@@ -55,6 +55,27 @@ CREATE TABLE IF NOT EXISTS articles (
 );
 
 -- ============================================================
+-- ROLES TABLE
+-- ============================================================
+CREATE TABLE IF NOT EXISTS roles (
+  id            uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  name          text UNIQUE NOT NULL,
+  created_at    timestamptz DEFAULT now()
+);
+
+-- Insert default roles
+INSERT INTO roles (name) VALUES 
+('Principal Product Engineer'),
+('Digital Architect'),
+('Interactive Web Engineer'),
+('Lead Frontend Developer'),
+('Full Stack Developer'),
+('UI/UX Designer'),
+('Project Manager'),
+('Backend Engineer')
+ON CONFLICT (name) DO NOTHING;
+
+-- ============================================================
 -- AUTO-UPDATE updated_at TRIGGER
 -- ============================================================
 CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -78,6 +99,7 @@ CREATE TRIGGER articles_updated_at
 -- ============================================================
 ALTER TABLE projects ENABLE ROW LEVEL SECURITY;
 ALTER TABLE articles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE roles ENABLE ROW LEVEL SECURITY;
 
 -- Public: hanya bisa baca konten yang sudah dipublish
 CREATE POLICY "Public can read published projects"
@@ -87,6 +109,12 @@ CREATE POLICY "Public can read published projects"
 CREATE POLICY "Public can read published articles"
   ON articles FOR SELECT
   USING (is_av_published = true);
+
+-- Roles: only authenticated admins can read and write roles
+CREATE POLICY "Authenticated users have full access to roles"
+  ON roles FOR ALL
+  USING (auth.role() = 'authenticated')
+  WITH CHECK (auth.role() = 'authenticated');
 
 -- Authenticated (admin): full access
 CREATE POLICY "Authenticated users have full access to projects"
@@ -98,3 +126,4 @@ CREATE POLICY "Authenticated users have full access to articles"
   ON articles FOR ALL
   USING (auth.role() = 'authenticated')
   WITH CHECK (auth.role() = 'authenticated');
+

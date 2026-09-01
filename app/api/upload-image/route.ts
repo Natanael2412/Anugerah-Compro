@@ -71,33 +71,43 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "No file provided" }, { status: 400 });
   }
 
-  const validTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/avif"];
+  const validTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/avif", "video/mp4", "video/webm"];
   if (!validTypes.includes(file.type)) {
     return NextResponse.json(
-      { error: "Invalid file type. Accepted: JPEG, PNG, WebP, AVIF" },
+      { error: "Invalid file type. Accepted: JPEG, PNG, WebP, AVIF, MP4, WebM" },
       { status: 400 }
     );
   }
 
-  // ── Sharp processing ─────────────────────────────────────
-  const sharp = (await import("sharp")).default;
-  const inputBuffer = Buffer.from(await file.arrayBuffer());
+  const isVideo = file.type.startsWith("video/");
 
+  // ── Sharp processing ─────────────────────────────────────
+  const inputBuffer = Buffer.from(await file.arrayBuffer());
+  
   let processedBuffer: Buffer;
-  try {
-    processedBuffer = await sharp(inputBuffer)
-      .resize({ width: 1920, withoutEnlargement: true })
-      .avif({ quality: 80, effort: 4 })
-      .toBuffer();
-  } catch (err) {
-    console.error("[upload-image] sharp error:", err);
-    return NextResponse.json({ error: "Image processing failed" }, { status: 500 });
+  const contentType = isVideo ? file.type : "image/avif";
+  const finalExtension = isVideo ? (file.type === "video/webm" ? "webm" : "mp4") : "avif";
+
+  if (isVideo) {
+    // For now, no compression for videos - directly pass the buffer
+    processedBuffer = inputBuffer;
+  } else {
+    const sharp = (await import("sharp")).default;
+    try {
+      processedBuffer = await sharp(inputBuffer)
+        .resize({ width: 1920, withoutEnlargement: true })
+        .avif({ quality: 80, effort: 4 })
+        .toBuffer();
+    } catch (err) {
+      console.error("[upload-media] sharp error:", err);
+      return NextResponse.json({ error: "Image processing failed" }, { status: 500 });
+    }
   }
 
   // ── Upload to Cloudflare R2 ───────────────────────────────
   const timestamp = Date.now();
   const baseName = file.name.replace(/\.[^.]+$/, "").replace(/\s+/g, "-");
-  const key = `${folder}/${timestamp}-${baseName}.avif`;
+  const key = `${folder}/${timestamp}-${baseName}.${finalExtension}`;
   const bucket = process.env.R2_BUCKET_NAME ?? "anugerah-ventures";
 
   try {
@@ -107,7 +117,7 @@ export async function POST(request: NextRequest) {
         Bucket: bucket,
         Key: key,
         Body: processedBuffer,
-        ContentType: "image/avif",
+        ContentType: contentType,
         CacheControl: "public, max-age=31536000, immutable",
         Metadata: {
           "uploaded-by": user.id,
@@ -128,7 +138,7 @@ export async function POST(request: NextRequest) {
     url: publicUrl,
     path: key,
     size: processedBuffer.length,
-    format: "avif",
+    format: finalExtension,
     bucket,
   });
 }
