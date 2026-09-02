@@ -1,77 +1,76 @@
 import type { Metadata } from "next";
-import dynamic from "next/dynamic";
-import { getPublishedProjects } from "@/lib/data/projects";
-import { getPublishedArticles } from "@/lib/data/articles";
 
-/**
- * All three sections are Client Components (GSAP / TanStack).
- * Dynamic import keeps the initial Server Component bundle lean.
- */
-const HeroSection = dynamic(() => import("@/components/sections/HeroSection"));
-const CurtainedNarrative = dynamic(
-  () => import("@/components/sections/CurtainedNarrative")
-);
-const HorizontalShowcase = dynamic(
-  () => import("@/components/sections/HorizontalShowcase")
-);
-const LatestInsights = dynamic(
-  () => import("@/components/sections/LatestInsights")
-);
-
-/* ============================================================
-   PAGE METADATA
-   ============================================================ */
 export const metadata: Metadata = {
-  title: "Anugerah Ventures",
+  title: "Anugerah Ventures — Under Development",
   description:
-    "Anugerah Ventures — Sistem yang bekerja ketika skalanya berubah. Arsitektur produk, kepemimpinan teknis, dan transformasi digital di Jakarta.",
-  openGraph: {
-    title: "Anugerah Ventures",
-    description:
-      "Sistem yang bekerja ketika skalanya berubah. Arsitektur produk, kepemimpinan teknis, dan transformasi digital.",
-  },
+    "Anugerah Ventures is currently under development. Check back later.",
 };
 
-/* ============================================================
-   HOME PAGE (Server Component — no styled-jsx, no client APIs)
-   ============================================================ */
-export default async function HomePage() {
-  const [publishedProjects, publishedArticles] = await Promise.all([
-    getPublishedProjects(),
-    getPublishedArticles()
-  ]);
-
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    name: "Anugerah Ventures",
-    url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://anugerahventures.com",
-    description: "Bespoke digital experiences, strategic technology leadership, and enterprise product development.",
-    sameAs: [],
-    address: {
-      "@type": "PostalAddress",
-      addressLocality: "Jakarta",
-      addressCountry: "ID",
-    },
-  };
-
+export default function HomePage() {
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-      {/* Section 1: The Core — Hero */}
-      <HeroSection />
-
-      {/* Section 2: The Curtained Narrative */}
-      <CurtainedNarrative />
-
-      {/* Section 3: The Horizontal Showcase */}
-      <HorizontalShowcase projects={publishedProjects} />
-
-      {/* Section 4: Latest Insights */}
-      <LatestInsights articles={publishedArticles} />
-    </>
+    <div style={{
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      minHeight: "100vh",
+      width: "100%",
+      backgroundColor: "var(--color-bg)",
+      color: "var(--color-text)",
+      fontFamily: "var(--font-helvetica)",
+    }}>
+      <div style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: "2rem",
+        opacity: 0,
+        animation: "fadeIn 1s ease forwards"
+      }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img 
+          src="/Logo-AV.avif" 
+          alt="Anugerah Ventures" 
+          style={{ 
+            width: "auto", 
+            height: "clamp(60px, 10vh, 100px)",
+            objectFit: "contain"
+          }}
+        />
+        <div style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: "0.5rem",
+          textAlign: "center"
+        }}>
+          <h1 style={{
+            fontFamily: "var(--font-playfair)",
+            fontSize: "clamp(1.5rem, 4vw, 2.5rem)",
+            fontWeight: 400,
+            letterSpacing: "0.02em",
+            color: "var(--color-text)",
+            margin: 0
+          }}>
+            Under Development
+          </h1>
+          <p style={{
+            fontSize: "clamp(0.875rem, 1.5vw, 1rem)",
+            color: "var(--color-text-subtle)",
+            maxWidth: "400px",
+            lineHeight: 1.6,
+            margin: 0
+          }}>
+            We are currently crafting a new digital experience. Please check back later.
+          </p>
+        </div>
+      </div>
+      <style dangerouslySetInnerHTML={{__html: `
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}} />
+    </div>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { usePathname } from "next/navigation";
 
 /* ============================================================
    FOOTER — "The Terminal"
@@ -16,6 +16,9 @@ const LOCATION = "Jakarta, Indonesia";
 const CURRENT_YEAR = new Date().getFullYear();
 
 export default function Footer() {
+  const pathname = usePathname();
+  if (pathname === "/") return null;
+
   return (
     <footer className="footer" id="footer" role="contentinfo">
       <div className="footer__inner">
