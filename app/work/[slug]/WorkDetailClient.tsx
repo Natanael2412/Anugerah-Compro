@@ -231,7 +231,7 @@ export default function WorkDetailClient({ project }: Props) {
               >
                 Overview
               </h2>
-              {project.live_url && (
+              {project.live_url && (!project.project_status || project.project_status === "public") && (
                 <a
                   href={project.live_url}
                   target="_blank"

@@ -13,6 +13,9 @@ export const projectSchema = z.object({
   gallery_urls: z.array(z.string()).default([]),
   is_av_published: z.boolean().default(false),
   is_personal_published: z.boolean().default(false),
+  is_av_featured: z.boolean().default(false),
+  is_personal_featured: z.boolean().default(false),
+  project_status: z.enum(['public', 'nda', 'concept']).default('public'),
 });
 
 export type ProjectInsert = z.infer<typeof projectSchema>;

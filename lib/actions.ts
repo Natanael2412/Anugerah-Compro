@@ -43,3 +43,11 @@ export async function updateProject(id: string, data: Record<string, unknown>) {
   revalidatePath(`/work/${data.slug ?? ""}`);
   redirect("/admin/projects");
 }
+
+export async function createProject(data: Record<string, unknown>) {
+  const supabase = await createClient();
+  const { error } = await supabase.from("projects").insert(data);
+  if (error) throw new Error(error.message);
+  revalidatePath("/admin/projects");
+  redirect("/admin/projects");
+}

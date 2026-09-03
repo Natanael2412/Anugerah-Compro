@@ -15,7 +15,10 @@ export async function getAllProjects(): Promise<Project[]> {
     .order("created_at", { ascending: false });
 
   if (error) {
-    console.error("[getAllProjects] Error:", error);
+    const errorDetails = error instanceof Error 
+      ? `${error.message} (Cause: ${(error as any).cause?.message || (error as any).cause})`
+      : JSON.stringify(error, Object.getOwnPropertyNames(error));
+    console.error("[getAllProjects] Error:", errorDetails);
     return [];
   }
   return data.map((p, i) => ({ ...p, index: i + 1 })) as Project[];
