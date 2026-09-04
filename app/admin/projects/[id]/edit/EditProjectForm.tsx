@@ -67,11 +67,44 @@ export default function EditProjectForm({ project }: { project: Project }) {
   };
 
   const uploadFile = async (file: File, folder: string) => {
+    // If the file is a video, use the presigned URL flow to bypass Vercel payload limits
+    if (file.type.startsWith("video/")) {
+      const ticketRes = await fetch("/api/upload-video-url", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ filename: file.name, filetype: file.type, folder }),
+      });
+      
+      if (!ticketRes.ok) {
+        const errData = await ticketRes.json().catch(() => ({}));
+        throw new Error(`Failed to get upload ticket (${ticketRes.status}): ${errData.error || file.name}`);
+      }
+      
+      const { presignedUrl, publicUrl } = await ticketRes.json();
+      
+      // Upload directly to Cloudflare R2
+      const uploadRes = await fetch(presignedUrl, {
+        method: "PUT",
+        body: file,
+        headers: { "Content-Type": file.type },
+      });
+      
+      if (!uploadRes.ok) {
+        throw new Error(`Direct upload failed (${uploadRes.status}): ${uploadRes.statusText}`);
+      }
+      
+      return publicUrl;
+    }
+
+    // Default flow for images (goes through Vercel for compression)
     const formData = new FormData();
     formData.append("file", file);
     formData.append("folder", folder);
     const res = await fetch("/api/upload-image", { method: "POST", body: formData });
-    if (!res.ok) throw new Error(`Upload failed for ${file.name}`);
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(`Upload failed (${res.status}): ${errData.error || file.name}`);
+    }
     const data = await res.json();
     return data.url;
   };
