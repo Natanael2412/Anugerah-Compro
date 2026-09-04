@@ -133,7 +133,7 @@ export default function NewProjectPage() {
       router.refresh();
     } catch (err) {
       console.error("[NewProject] Error:", err);
-      showToast("Gagal menyimpan proyek.", "error");
+      showToast(`Gagal menyimpan proyek: ${err instanceof Error ? err.message : String(err)}`, "error");
       setError("Failed to create project in database.");
     } finally {
       setLoading(false);
@@ -227,258 +227,204 @@ export default function NewProjectPage() {
   galleryFiles.forEach(f => allMedia.push({ source: 'gallery', type: 'file', item: f, preview: getPreviewUrl(f), isVideo: isVideo(f) }));
 
 
+
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-neutral-200">
+    <div style={{ minHeight: "100vh", background: "var(--color-base)" }}>
       <AdminNav />
-      
-      <main className="max-w-[1400px] w-full mx-auto px-4 md:px-8 pt-[calc(var(--nav-height,64px)+3rem)] pb-16">
+
+      <main style={{ marginLeft: "220px", paddingTop: "3rem", paddingBottom: "4rem" }} className="px-8">
         <div className="flex justify-between items-end mb-10">
           <div>
-            <p className="font-serif italic text-xs text-neutral-500 mb-1">Create</p>
-            <h1 className="font-sans text-2xl md:text-3xl font-light text-white tracking-tight">
-              New Project
+            <p style={{ fontFamily: "var(--font-citadel)", fontSize: "0.75rem", fontStyle: "italic", color: "var(--color-silver)", marginBottom: "0.25rem" }}>New Project</p>
+            <h1 style={{ fontFamily: "var(--font-helvetica)", fontSize: "clamp(1.5rem, 2.5vw, 2rem)", fontWeight: 300, color: "var(--color-text)", letterSpacing: "-0.01em" }}>
+              Add Project
             </h1>
           </div>
-          <button 
-            type="button" 
-            onClick={() => router.back()} 
-            className="font-sans text-[0.65rem] tracking-[0.12em] uppercase text-neutral-500 hover:text-white transition-colors"
+          <button
+            type="button"
+            onClick={() => router.back()}
+            style={{ fontFamily: "var(--font-helvetica)", fontSize: "0.62rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-text-subtle)", background: "none", border: "none", cursor: "pointer" }}
           >
-            ← Back
+            â† Back
           </button>
         </div>
 
-        <ProjectAiCopilot onAccept={handleAiAccept} />
-
         {error && (
-          <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-md text-red-400 text-sm">
+          <div style={{ marginBottom: "1.5rem", padding: "1rem", background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: "4px", color: "#f87171", fontFamily: "var(--font-helvetica)", fontSize: "0.875rem" }}>
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
-          
+
           {/* LEFT COLUMN (7 cols) */}
           <div className="lg:col-span-7 flex flex-col gap-6">
-            
+
             <div className="flex flex-col gap-2">
-              <label htmlFor="title" className="font-sans text-[0.62rem] tracking-[0.18em] uppercase text-neutral-500">Title</label>
-              <input 
-                id="title" type="text" value={form.title} onChange={(e) => updateForm("title", e.target.value)} required
-                className="w-full bg-white/5 border border-white/10 rounded-sm px-4 py-3 font-sans text-sm text-white outline-none focus:border-white/30 transition-colors"
-              />
+              <label htmlFor="title" style={labelStyle}>Title</label>
+              <input id="title" type="text" value={form.title} onChange={(e) => updateForm("title", e.target.value)} required style={inputStyle} />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="flex flex-col gap-2">
-                <label htmlFor="client" className="font-sans text-[0.62rem] tracking-[0.18em] uppercase text-neutral-500">Client (Optional)</label>
-                <input 
-                  id="client" type="text" value={form.client} onChange={(e) => updateForm("client", e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-sm px-4 py-3 font-sans text-sm text-white outline-none focus:border-white/30 transition-colors"
-                />
+                <label htmlFor="client" style={labelStyle}>Client (Optional)</label>
+                <input id="client" type="text" value={form.client} onChange={(e) => updateForm("client", e.target.value)} style={inputStyle} />
               </div>
               <div className="flex flex-col gap-2">
-                <label htmlFor="role" className="font-sans text-[0.62rem] tracking-[0.18em] uppercase text-neutral-500">Role</label>
+                <label htmlFor="role" style={labelStyle}>Role</label>
                 <RoleManager value={form.role} onChange={(val) => updateForm("role", val)} />
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="flex flex-col gap-2">
-                <label htmlFor="live_url" className="font-sans text-[0.62rem] tracking-[0.18em] uppercase text-neutral-500">Live URL (Optional)</label>
-                <input 
-                  id="live_url" type="url" value={form.live_url} onChange={(e) => updateForm("live_url", e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-sm px-4 py-3 font-sans text-sm text-white outline-none focus:border-white/30 transition-colors"
-                />
+                <label htmlFor="live_url" style={labelStyle}>Live URL (Optional)</label>
+                <input id="live_url" type="url" value={form.live_url} onChange={(e) => updateForm("live_url", e.target.value)} style={inputStyle} />
               </div>
               <div className="flex flex-col gap-2">
-                <label htmlFor="tech_stack" className="font-sans text-[0.62rem] tracking-[0.18em] uppercase text-neutral-500">Tech Stack (comma-separated)</label>
-                <input 
-                  id="tech_stack" type="text" value={form.tech_stack} onChange={(e) => updateForm("tech_stack", e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-sm px-4 py-3 font-sans text-sm text-white outline-none focus:border-white/30 transition-colors"
-                />
+                <label htmlFor="tech_stack" style={labelStyle}>Tech Stack (comma-separated)</label>
+                <input id="tech_stack" type="text" value={form.tech_stack} onChange={(e) => updateForm("tech_stack", e.target.value)} style={inputStyle} />
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="flex flex-col gap-2">
-                <label htmlFor="slug" className="font-sans text-[0.62rem] tracking-[0.18em] uppercase text-neutral-500">Slug</label>
-                <input 
-                  id="slug" type="text" value={form.slug} onChange={(e) => updateForm("slug", e.target.value)} required
-                  className="w-full bg-white/5 border border-white/10 rounded-sm px-4 py-3 font-sans text-sm text-white outline-none focus:border-white/30 transition-colors"
-                />
+                <label htmlFor="slug" style={labelStyle}>Slug</label>
+                <input id="slug" type="text" value={form.slug} onChange={(e) => updateForm("slug", e.target.value)} required style={inputStyle} />
               </div>
               <div className="flex flex-col gap-2">
-                <label htmlFor="year" className="font-sans text-[0.62rem] tracking-[0.18em] uppercase text-neutral-500">Year</label>
-                <input 
-                  id="year" type="number" value={form.year} onChange={(e) => updateForm("year", e.target.value)} min="2000" max="2099"
-                  className="w-full bg-white/5 border border-white/10 rounded-sm px-4 py-3 font-sans text-sm text-white outline-none focus:border-white/30 transition-colors"
-                />
+                <label htmlFor="year" style={labelStyle}>Year</label>
+                <input id="year" type="number" value={form.year} onChange={(e) => updateForm("year", e.target.value)} min="2000" max="2099" style={inputStyle} />
               </div>
             </div>
 
             <div className="flex flex-col gap-2">
-              <label htmlFor="description" className="font-sans text-[0.62rem] tracking-[0.18em] uppercase text-neutral-500">Description</label>
-              <textarea 
-                id="description" value={form.description} onChange={(e) => updateForm("description", e.target.value)} maxLength={500}
-                className="w-full bg-white/5 border border-white/10 rounded-sm px-4 py-3 font-sans text-sm text-white outline-none focus:border-white/30 transition-colors min-h-[120px] resize-y"
-              />
-              <div className="text-right text-[0.7rem] text-neutral-500 font-sans mt-1">
+              <label htmlFor="description" style={labelStyle}>Description</label>
+              <textarea id="description" value={form.description} onChange={(e) => updateForm("description", e.target.value)} maxLength={500}
+                style={{ ...inputStyle, minHeight: "120px", resize: "vertical" }} />
+              <div style={{ textAlign: "right", fontSize: "0.7rem", color: "var(--color-text-subtle)", fontFamily: "var(--font-helvetica)", marginTop: "0.25rem" }}>
                 {form.description.length} / 500
               </div>
             </div>
 
             {/* DISTRIBUTION & FEATURED TOGGLES */}
-            <div className="bg-[#111] border border-white/10 p-6 rounded-md">
-              <h3 className="font-sans text-sm text-neutral-300 mb-5">Distribution & Featured</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                
-                <ToggleRow 
-                  id="is_av_published" 
-                  label="Publish to Anugerah Ventures" 
-                  checked={form.is_av_published} 
-                  onChange={(c) => updateForm("is_av_published", c)} 
-                />
-                <ToggleRow 
-                  id="is_personal_published" 
-                  label="Publish to Personal Site" 
-                  checked={form.is_personal_published} 
-                  onChange={(c) => updateForm("is_personal_published", c)} 
-                />
-                <ToggleRow 
-                  id="is_av_featured" 
-                  label="Feature on AV Home" 
-                  checked={form.is_av_featured} 
-                  onChange={(c) => updateForm("is_av_featured", c)} 
-                />
-                <ToggleRow 
-                  id="is_personal_featured" 
-                  label="Feature on Personal Home" 
-                  checked={form.is_personal_featured} 
-                  onChange={(c) => updateForm("is_personal_featured", c)} 
-                />
-
+            <div style={{ background: "var(--color-surface)", border: "1px solid rgba(192,192,192,0.1)", padding: "1.5rem", borderRadius: "4px" }}>
+              <h3 style={{ fontFamily: "var(--font-helvetica)", fontSize: "0.75rem", color: "var(--color-text)", marginBottom: "1.25rem" }}>Distribution &amp; Featured</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <ToggleRow id="is_av_published" label="Publish to Anugerah Ventures" checked={form.is_av_published} onChange={(c) => updateForm("is_av_published", c)} />
+                <ToggleRow id="is_personal_published" label="Publish to Personal Site" checked={form.is_personal_published} onChange={(c) => updateForm("is_personal_published", c)} />
+                <ToggleRow id="is_av_featured" label="Feature on AV Home" checked={form.is_av_featured} onChange={(c) => updateForm("is_av_featured", c)} />
+                <ToggleRow id="is_personal_featured" label="Feature on Personal Home" checked={form.is_personal_featured} onChange={(c) => updateForm("is_personal_featured", c)} />
               </div>
             </div>
 
             {/* PROJECT STATUS */}
-            <div className="bg-[#111] border border-white/10 p-6 rounded-md flex flex-col gap-3">
-              <label htmlFor="project_status" className="font-sans text-[0.62rem] tracking-[0.18em] uppercase text-neutral-500">Project Status (Access)</label>
-              <div className="relative">
-                <select 
+            <div style={{ background: "var(--color-surface)", border: "1px solid rgba(192,192,192,0.1)", padding: "1.5rem", borderRadius: "4px" }} className="flex flex-col gap-3">
+              <label htmlFor="project_status" style={labelStyle}>Project Status (Access)</label>
+              <div style={{ position: "relative" }}>
+                <select
                   id="project_status"
                   value={form.project_status}
                   onChange={(e) => updateForm("project_status", e.target.value)}
-                  className="w-full appearance-none bg-white/5 border border-white/10 rounded-sm px-4 py-3 font-sans text-sm text-white outline-none focus:border-white/30 transition-colors cursor-pointer pr-10"
+                  style={{ ...inputStyle, appearance: "none", WebkitAppearance: "none", paddingRight: "2.5rem", cursor: "pointer" } as React.CSSProperties}
                 >
-                  <option value="public" className="bg-[#111] text-white">🌍 Public (Live link displayed)</option>
-                  <option value="nda" className="bg-[#111] text-white">🔒 NDA Protected (Live link hidden)</option>
-                  <option value="concept" className="bg-[#111] text-white">💡 Concept Work (Live link hidden)</option>
+                  <option value="public" style={{ background: "#111", color: "#fff" }}>🌍 Public (Boleh di-share)</option>
+                  <option value="nda" style={{ background: "#111", color: "#fff" }}>🔒 NDA (Dokumentasi tertutup)</option>
+                  <option value="concept" style={{ background: "#111", color: "#fff" }}>💡 Concept (Dummy, proprietary, dll)</option>
                 </select>
-                <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-neutral-400">
+                <div style={{ position: "absolute", top: 0, bottom: 0, right: "0.75rem", display: "flex", alignItems: "center", pointerEvents: "none", color: "var(--color-text-subtle)" }}>
                   <ChevronDown size={16} />
                 </div>
               </div>
             </div>
 
             {/* MEDIA MANAGE BUTTON */}
-            <div className="mt-4">
-              <button 
-                type="button" 
+            <div style={{ marginTop: "0.5rem" }}>
+              <button
+                type="button"
                 onClick={() => setIsMediaModalOpen(true)}
-                className="w-full py-4 border border-white/20 border-dashed rounded-md text-neutral-300 hover:text-white hover:border-white/40 hover:bg-white/5 transition-all flex items-center justify-center gap-2 font-sans text-sm"
+                style={{ width: "100%", padding: "1rem", border: "1px dashed rgba(192,192,192,0.2)", borderRadius: "4px", background: "transparent", color: "var(--color-text-muted)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem", fontFamily: "var(--font-helvetica)", fontSize: "0.875rem" }}
               >
                 <ImageIcon size={18} />
-                Manage Media & Assets
-                <span className="ml-2 px-2 py-0.5 rounded-full bg-white/10 text-xs text-neutral-400">
+                Manage Media &amp; Assets
+                <span style={{ marginLeft: "0.5rem", padding: "0.1rem 0.5rem", borderRadius: "999px", background: "rgba(192,192,192,0.08)", fontSize: "0.72rem", color: "var(--color-text-subtle)" }}>
                   {allMedia.length} Items
                 </span>
               </button>
             </div>
 
-            <button 
-              type="submit" 
-              disabled={loading} 
-              className={`mt-8 w-full py-4 bg-white/10 border border-white/20 rounded-md font-sans text-[0.7rem] tracking-[0.18em] uppercase text-white transition-all ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-white/20 cursor-pointer'}`}
+            <button
+              type="submit"
+              disabled={loading}
+              style={{ marginTop: "2rem", width: "100%", padding: "1rem", background: "rgba(192,192,192,0.06)", border: "1px solid rgba(192,192,192,0.2)", borderRadius: "4px", fontFamily: "var(--font-helvetica)", fontSize: "0.7rem", letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--color-text)", cursor: loading ? "not-allowed" : "pointer", opacity: loading ? 0.5 : 1, transition: "all 0.2s ease" }}
             >
-              {loading ? "Creating…" : "Create Project"}
+              {loading ? "Creatingâ€¦" : "Create Project"}
             </button>
           </div>
 
           {/* RIGHT COLUMN (5 cols) - Live Preview */}
           <div className="lg:col-span-5 relative">
-            <div className="sticky top-[calc(var(--nav-height,64px)+2rem)] w-full">
-              <p className="font-serif text-[0.75rem] italic text-neutral-500 mb-3 text-right">Live Preview</p>
-              
-              <div className="w-full aspect-[3/4] bg-[#0a0a0a] border border-white/10 flex flex-col relative overflow-hidden group">
-                
-                {/* STATUS BADGES OVERLAY */}
-                <div className="absolute top-4 right-4 z-10 flex gap-2">
+            <div style={{ position: "sticky", top: "2rem" }}>
+              <p style={{ fontFamily: "var(--font-citadel)", fontSize: "0.75rem", fontStyle: "italic", color: "var(--color-text-subtle)", marginBottom: "0.75rem", textAlign: "right" }}>Live Preview</p>
+
+              <div style={{ width: "100%", aspectRatio: "3/4", background: "var(--color-surface)", border: "1px solid rgba(192,192,192,0.1)", display: "flex", flexDirection: "column", position: "relative", overflow: "hidden" }}>
+
+                <div style={{ position: "absolute", top: "1rem", right: "1rem", zIndex: 10, display: "flex", gap: "0.5rem" }}>
                   {form.project_status === 'nda' && (
-                    <span className="px-3 py-1 text-[0.65rem] font-medium tracking-wide text-white bg-black/80 backdrop-blur-md rounded-full border border-white/10">
+                    <span style={{ padding: "0.25rem 0.75rem", fontSize: "0.62rem", fontWeight: 500, color: "var(--color-text)", background: "rgba(0,0,0,0.8)", borderRadius: "999px", border: "1px solid rgba(255,255,255,0.1)", fontFamily: "var(--font-helvetica)" }}>
                       🔒 NDA Protected
                     </span>
                   )}
                   {form.project_status === 'concept' && (
-                    <span className="px-3 py-1 text-[0.65rem] font-medium tracking-wide text-black bg-white/90 backdrop-blur-md rounded-full shadow-sm">
+                    <span style={{ padding: "0.25rem 0.75rem", fontSize: "0.62rem", fontWeight: 500, color: "#111", background: "rgba(255,255,255,0.9)", borderRadius: "999px", fontFamily: "var(--font-helvetica)" }}>
                       💡 Concept
                     </span>
                   )}
                 </div>
 
-                {/* Media Container */}
-                <div className="h-[45%] w-full relative bg-black/50 border-b border-white/5">
+                <div style={{ height: "45%", width: "100%", background: "rgba(0,0,0,0.4)", borderBottom: "1px solid rgba(255,255,255,0.04)", position: "relative", overflow: "hidden" }}>
                   {allMedia.length > 0 && allMedia[0].source === 'hero' ? (
                     allMedia[0].isVideo ? (
-                       <div className="w-full h-full bg-neutral-900 flex items-center justify-center">
-                         <VideoIcon size={32} className="text-neutral-700" />
-                       </div>
+                      <div style={{ width: "100%", height: "100%", background: "#1a1a1a", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <VideoIcon size={32} style={{ color: "#333" }} />
+                      </div>
                     ) : (
-                      /* eslint-disable-next-line @next/next/no-img-element */
-                      <img src={allMedia[0].preview} alt="Hero Preview" className="w-full h-full object-cover" />
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={allMedia[0].preview} alt="Hero Preview" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                     )
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center font-sans text-[0.7rem] tracking-[0.1em] uppercase text-neutral-600">
+                    <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-helvetica)", fontSize: "0.65rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(192,192,192,0.2)" }}>
                       No Hero Media
                     </div>
                   )}
                 </div>
 
-                {/* Content Container */}
-                <div className="p-6 flex flex-col flex-1">
-                  <div className="flex justify-between items-center mb-4">
-                    <span className="font-sans text-[0.6rem] tracking-[0.2em] uppercase text-neutral-400">
+                <div style={{ padding: "1.5rem", display: "flex", flexDirection: "column", flex: 1 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+                    <span style={{ fontFamily: "var(--font-helvetica)", fontSize: "0.58rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--color-text-subtle)" }}>
                       {form.role || "Role"}
                     </span>
-                    <span className="font-serif text-[0.75rem] text-neutral-500 italic">
+                    <span style={{ fontFamily: "var(--font-citadel)", fontSize: "0.75rem", color: "var(--color-text-subtle)", fontStyle: "italic" }}>
                       {form.year || "Year"}
                     </span>
                   </div>
-
-                  <h3 className="font-sans text-lg md:text-xl font-medium tracking-tight leading-tight text-white mb-3">
+                  <h3 style={{ fontFamily: "var(--font-helvetica)", fontSize: "1.1rem", fontWeight: 400, letterSpacing: "-0.01em", lineHeight: 1.3, color: "var(--color-text)", marginBottom: "0.75rem" }}>
                     {form.title || "Project Title"}
                   </h3>
-
-                  <p className="font-sans text-sm font-light leading-relaxed text-neutral-400 flex-1 line-clamp-3">
+                  <p style={{ fontFamily: "var(--font-helvetica)", fontSize: "0.8rem", fontWeight: 300, lineHeight: 1.7, color: "var(--color-text-muted)", flex: 1, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" } as React.CSSProperties}>
                     {form.description || "Description preview..."}
                   </p>
-
-                  <ul className="flex flex-wrap gap-2 list-none m-0 p-0 mt-4">
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem", marginTop: "1rem" }}>
                     {form.tech_stack ? form.tech_stack.split(",").slice(0, 3).map((tag, i) => (
-                      <li key={i} className="font-sans text-[0.55rem] tracking-[0.15em] uppercase text-neutral-500 border border-white/10 px-2 py-1 rounded-sm">
+                      <span key={i} style={{ fontFamily: "var(--font-helvetica)", fontSize: "0.55rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-text-subtle)", border: "1px solid rgba(192,192,192,0.12)", padding: "0.15rem 0.4rem", borderRadius: "2px" }}>
                         {tag.trim()}
-                      </li>
+                      </span>
                     )) : (
-                      <li className="font-sans text-[0.55rem] tracking-[0.15em] uppercase text-neutral-500 border border-white/10 px-2 py-1 rounded-sm">
+                      <span style={{ fontFamily: "var(--font-helvetica)", fontSize: "0.55rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-text-subtle)", border: "1px solid rgba(192,192,192,0.12)", padding: "0.15rem 0.4rem", borderRadius: "2px" }}>
                         TECH STACK
-                      </li>
+                      </span>
                     )}
-                    {form.tech_stack.split(",").length > 3 && (
-                       <li className="font-sans text-[0.55rem] tracking-[0.15em] uppercase text-neutral-500 border border-white/10 px-2 py-1 rounded-sm">
-                       +{form.tech_stack.split(",").length - 3}
-                     </li>
-                    )}
-                  </ul>
+                  </div>
                 </div>
               </div>
             </div>
@@ -488,145 +434,182 @@ export default function NewProjectPage() {
 
       {/* MEDIA MANAGEMENT MODAL */}
       {isMediaModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 md:p-8">
-          <div className="bg-[#111] border border-white/10 rounded-lg w-full max-w-5xl max-h-[90vh] flex flex-col shadow-2xl">
-            
-            {/* Modal Header */}
-            <div className="flex justify-between items-center p-6 border-b border-white/5">
-              <h2 className="font-sans text-lg text-white font-medium flex items-center gap-2">
-                <ImageIcon size={20} className="text-neutral-400"/>
-                Manage Media & Assets
+        <div style={{ position: "fixed", inset: 0, zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.85)", padding: "2rem" }}>
+          <div style={{ background: "var(--color-surface)", border: "1px solid rgba(192,192,192,0.1)", borderRadius: "6px", width: "95vw", maxWidth: "1600px", maxHeight: "90vh", display: "flex", flexDirection: "column", boxShadow: "0 25px 50px rgba(0,0,0,0.5)" }}>
+
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "1.5rem", borderBottom: "1px solid rgba(192,192,192,0.06)" }}>
+              <h2 style={{ fontFamily: "var(--font-helvetica)", fontSize: "1rem", color: "var(--color-text)", fontWeight: 400, display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <ImageIcon size={18} style={{ color: "var(--color-text-subtle)" }} />
+                Manage Media &amp; Assets
               </h2>
-              <button onClick={() => setIsMediaModalOpen(false)} className="text-neutral-500 hover:text-white p-1 transition-colors">
+              <button onClick={() => setIsMediaModalOpen(false)} style={{ color: "var(--color-text-subtle)", background: "none", border: "none", cursor: "pointer", padding: "0.25rem" }}>
                 <X size={20} />
               </button>
             </div>
 
-            {/* Modal Body */}
-            <div className="p-6 overflow-y-auto flex-1 flex flex-col gap-6">
-              
-              {/* Dropzone Area */}
-              <label 
+            <div style={{ padding: "1.5rem", overflowY: "auto", flex: 1, display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+              <label
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={handleDrop}
-                className="w-full flex flex-col items-center justify-center py-8 border-2 border-dashed border-white/10 rounded-md hover:border-white/30 hover:bg-white/5 transition-all cursor-pointer"
+                style={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "2rem", border: "2px dashed rgba(192,192,192,0.15)", borderRadius: "4px", cursor: "pointer" }}
               >
-                <UploadCloud size={32} className="text-neutral-500 mb-3" />
-                <p className="font-sans text-sm text-neutral-300 mb-1">Click or drag media here to upload</p>
-                <p className="font-sans text-xs text-neutral-500">Supports JPG, PNG, WEBP, MP4, WEBM</p>
-                <input 
-                  type="file" 
-                  multiple 
-                  accept="image/jpeg,image/png,image/webp,video/mp4,video/webm" 
-                  onChange={handleFileSelect}
-                  className="hidden" 
-                />
+                <UploadCloud size={30} style={{ color: "var(--color-text-subtle)", marginBottom: "0.75rem" }} />
+                <p style={{ fontFamily: "var(--font-helvetica)", fontSize: "0.875rem", color: "var(--color-text-muted)", marginBottom: "0.25rem" }}>Click or drag media here to upload</p>
+                <p style={{ fontFamily: "var(--font-helvetica)", fontSize: "0.72rem", color: "var(--color-text-subtle)" }}>Supports JPG, PNG, WEBP, MP4, WEBM</p>
+                <input type="file" multiple accept="image/jpeg,image/png,image/webp,video/mp4,video/webm" onChange={handleFileSelect} style={{ display: "none" }} />
               </label>
 
-              {/* Media Grid */}
-              <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-                {allMedia.length === 0 ? (
-                  <div className="col-span-full py-12 text-center font-sans text-sm text-neutral-600">
-                    No media items added yet.
-                  </div>
-                ) : (
-                  allMedia.map((media, idx) => (
-                    <div key={idx} className="relative aspect-video bg-neutral-900 rounded-md overflow-hidden group border border-white/5">
-                      
-                      {/* PREVIEW */}
-                      {media.isVideo ? (
-                        <div className="w-full h-full flex items-center justify-center bg-black text-neutral-700">
-                          <VideoIcon size={32} />
+              {/* Media Sections */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
+                
+                {/* Hero Media Section */}
+                <div>
+                  <h3 style={{ fontFamily: "var(--font-helvetica)", fontSize: "0.85rem", color: "var(--color-text)", marginBottom: "1rem", borderBottom: "1px solid rgba(192,192,192,0.1)", paddingBottom: "0.5rem" }}>
+                    Hero Media
+                  </h3>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "1rem" }}>
+                    {allMedia.filter(m => m.source === 'hero').length === 0 ? (
+                      <div style={{ gridColumn: "1/-1", padding: "2rem", border: "1px dashed rgba(192,192,192,0.2)", borderRadius: "4px", textAlign: "center", fontSize: "0.75rem", color: "var(--color-text-subtle)", fontFamily: "var(--font-helvetica)" }}>
+                        No hero media selected. Upload and make a media item hero.
+                      </div>
+                    ) : (
+                      allMedia.filter(m => m.source === 'hero').map((media, idx) => (
+                        <div key={idx} className="group" style={{ position: "relative", aspectRatio: "16/9", background: "#111", borderRadius: "4px", overflow: "hidden", border: "1px solid rgba(192,192,192,0.06)" }}>
+                          {media.isVideo ? (
+                            <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", background: "#000", color: "#333" }}>
+                              <VideoIcon size={28} />
+                            </div>
+                          ) : (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={media.preview} alt="Media" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                          )}
+                          {/* Badges */}
+                          <div style={{ position: "absolute", top: "0.5rem", left: "0.5rem", display: "flex", gap: "0.25rem" }}>
+                            <span style={{ background: "rgba(37,99,235,0.9)", color: "white", fontSize: "0.55rem", fontFamily: "var(--font-helvetica)", fontWeight: 500, padding: "0.15rem 0.4rem", borderRadius: "2px", display: "flex", alignItems: "center", gap: "0.2rem" }}>
+                              <Star size={9} fill="currentColor" /> Hero
+                            </span>
+                            {media.isVideo && (
+                              <span style={{ background: "rgba(0,0,0,0.8)", color: "white", fontSize: "0.55rem", fontFamily: "var(--font-helvetica)", fontWeight: 500, padding: "0.15rem 0.4rem", borderRadius: "2px" }}>
+                                Video
+                              </span>
+                            )}
+                          </div>
+                          {/* Hover Overlay */}
+                          <div className="opacity-0 group-hover:opacity-100 transition-opacity" style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.65)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "0.5rem" }}>
+                            <button
+                              type="button"
+                              onClick={() => { if (media.type === 'url') deleteUrl(media.item as string); else deleteFile(media.item as File); }}
+                              style={{ fontFamily: "var(--font-helvetica)", fontSize: "0.7rem", background: "rgba(239,68,68,0.2)", color: "#fca5a5", border: "none", borderRadius: "3px", padding: "0.35rem 0.75rem", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.35rem" }}
+                            >
+                              <Trash2 size={11} /> Delete
+                            </button>
+                          </div>
                         </div>
-                      ) : (
-                        /* eslint-disable-next-line @next/next/no-img-element */
-                        <img src={media.preview} alt="Media" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                      )}
+                      ))
+                    )}
+                  </div>
+                </div>
 
-                      {/* BADGES */}
-                      <div className="absolute top-2 left-2 z-10 flex gap-1">
-                        {media.source === 'hero' && (
-                           <span className="bg-blue-600/90 text-white text-[0.55rem] font-medium px-2 py-0.5 rounded-sm backdrop-blur-sm flex items-center gap-1">
-                             <Star size={10} fill="currentColor"/> Hero
-                           </span>
-                        )}
-                        {media.isVideo && (
-                           <span className="bg-black/80 text-white text-[0.55rem] font-medium px-2 py-0.5 rounded-sm backdrop-blur-sm">
-                             Video
-                           </span>
-                        )}
+                {/* Gallery Media Section */}
+                <div>
+                  <h3 style={{ fontFamily: "var(--font-helvetica)", fontSize: "0.85rem", color: "var(--color-text)", marginBottom: "1rem", borderBottom: "1px solid rgba(192,192,192,0.1)", paddingBottom: "0.5rem" }}>
+                    Gallery Media
+                  </h3>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "1rem" }}>
+                    {allMedia.filter(m => m.source !== 'hero').length === 0 ? (
+                      <div style={{ gridColumn: "1/-1", padding: "2rem", border: "1px dashed rgba(192,192,192,0.2)", borderRadius: "4px", textAlign: "center", fontSize: "0.75rem", color: "var(--color-text-subtle)", fontFamily: "var(--font-helvetica)" }}>
+                        No gallery items added yet.
                       </div>
-
-                      {/* HOVER OVERLAY & ACTIONS */}
-                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 z-20">
-                         {media.source !== 'hero' && (
-                           <button 
-                             type="button"
-                             onClick={() => {
-                               if (media.type === 'url') makeHeroUrl(media.item as string);
-                               else makeHeroFile(media.item as File);
-                             }}
-                             className="text-xs font-sans bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-sm flex items-center gap-1.5 transition-colors"
-                           >
-                             <Star size={12}/> Make Hero
-                           </button>
-                         )}
-                         
-                         <button 
-                           type="button"
-                           onClick={() => {
-                             if (media.type === 'url') deleteUrl(media.item as string);
-                             else deleteFile(media.item as File);
-                           }}
-                           className="text-xs font-sans bg-red-500/20 hover:bg-red-500/40 text-red-100 px-3 py-1.5 rounded-sm flex items-center gap-1.5 transition-colors"
-                         >
-                           <Trash2 size={12}/> Delete
-                         </button>
-                      </div>
-                    </div>
-                  ))
-                )}
+                    ) : (
+                      allMedia.filter(m => m.source !== 'hero').map((media, idx) => (
+                        <div key={idx} className="group" style={{ position: "relative", aspectRatio: "16/9", background: "#111", borderRadius: "4px", overflow: "hidden", border: "1px solid rgba(192,192,192,0.06)" }}>
+                          {media.isVideo ? (
+                            <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", background: "#000", color: "#333" }}>
+                              <VideoIcon size={28} />
+                            </div>
+                          ) : (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={media.preview} alt="Media" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                          )}
+                          {/* Badges */}
+                          <div style={{ position: "absolute", top: "0.5rem", left: "0.5rem", display: "flex", gap: "0.25rem" }}>
+                            {media.isVideo && (
+                              <span style={{ background: "rgba(0,0,0,0.8)", color: "white", fontSize: "0.55rem", fontFamily: "var(--font-helvetica)", fontWeight: 500, padding: "0.15rem 0.4rem", borderRadius: "2px" }}>
+                                Video
+                              </span>
+                            )}
+                          </div>
+                          {/* Hover Overlay */}
+                          <div className="opacity-0 group-hover:opacity-100 transition-opacity" style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.65)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "0.5rem" }}>
+                            <button
+                              type="button"
+                              onClick={() => { if (media.type === 'url') makeHeroUrl(media.item as string); else makeHeroFile(media.item as File); }}
+                              style={{ fontFamily: "var(--font-helvetica)", fontSize: "0.7rem", background: "rgba(255,255,255,0.1)", color: "white", border: "none", borderRadius: "3px", padding: "0.35rem 0.75rem", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.35rem" }}
+                            >
+                              <Star size={11} /> Make Hero
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => { if (media.type === 'url') deleteUrl(media.item as string); else deleteFile(media.item as File); }}
+                              style={{ fontFamily: "var(--font-helvetica)", fontSize: "0.7rem", background: "rgba(239,68,68,0.2)", color: "#fca5a5", border: "none", borderRadius: "3px", padding: "0.35rem 0.75rem", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.35rem" }}
+                            >
+                              <Trash2 size={11} /> Delete
+                            </button>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
               </div>
-
             </div>
 
-            {/* Modal Footer */}
-            <div className="p-4 border-t border-white/5 flex justify-end">
-               <button 
-                 type="button" 
-                 onClick={() => setIsMediaModalOpen(false)}
-                 className="px-6 py-2 bg-white/10 hover:bg-white/20 text-white font-sans text-sm rounded-sm transition-colors"
-               >
-                 Done
-               </button>
+            <div style={{ padding: "1rem 1.5rem", borderTop: "1px solid rgba(192,192,192,0.06)", display: "flex", justifyContent: "flex-end" }}>
+              <button type="button" onClick={() => setIsMediaModalOpen(false)}
+                style={{ padding: "0.5rem 1.5rem", background: "rgba(192,192,192,0.08)", border: "1px solid rgba(192,192,192,0.15)", borderRadius: "3px", fontFamily: "var(--font-helvetica)", fontSize: "0.75rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--color-text)", cursor: "pointer" }}
+              >
+                Done
+              </button>
             </div>
-
           </div>
         </div>
       )}
-
     </div>
   );
 }
 
-// Subcomponent for Custom Toggles
-function ToggleRow({ id, label, checked, onChange }: { id: string, label: string, checked: boolean, onChange: (c: boolean) => void }) {
+// Shared input styles
+const inputStyle: React.CSSProperties = {
+  width: "100%",
+  background: "rgba(192,192,192,0.04)",
+  border: "1px solid rgba(192,192,192,0.1)",
+  borderRadius: "2px",
+  padding: "0.75rem 1rem",
+  fontFamily: "var(--font-helvetica)",
+  fontSize: "0.875rem",
+  color: "var(--color-text)",
+  outline: "none",
+  transition: "border-color 0.2s ease",
+};
+
+const labelStyle: React.CSSProperties = {
+  fontFamily: "var(--font-helvetica)",
+  fontSize: "0.6rem",
+  letterSpacing: "0.18em",
+  textTransform: "uppercase",
+  color: "var(--color-text-subtle)",
+};
+
+function ToggleRow({ id, label, checked, onChange }: { id: string; label: string; checked: boolean; onChange: (c: boolean) => void }) {
   return (
-    <div className="flex items-center justify-between">
-      <label htmlFor={id} className="font-sans text-[0.72rem] tracking-[0.12em] uppercase text-neutral-400 cursor-pointer select-none">
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "1rem" }}>
+      <label htmlFor={id} style={{ fontFamily: "var(--font-helvetica)", fontSize: "0.68rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--color-text-muted)", cursor: "pointer", userSelect: "none", flex: 1 }}>
         {label}
       </label>
-      <button
-        id={id}
-        type="button"
-        role="switch"
-        aria-checked={checked}
-        onClick={() => onChange(!checked)}
-        className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-white/20 ${checked ? 'bg-white' : 'bg-white/10'}`}
+      <button id={id} type="button" role="switch" aria-checked={checked} onClick={() => onChange(!checked)}
+        style={{ flexShrink: 0, position: "relative", display: "inline-flex", height: "20px", width: "36px", cursor: "pointer", borderRadius: "999px", border: "2px solid transparent", transition: "background-color 0.2s ease", background: checked ? "var(--color-silver)" : "rgba(192,192,192,0.12)", outline: "none" }}
       >
-        <span
-          className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-[#111] shadow ring-0 transition duration-200 ease-in-out ${checked ? 'translate-x-4' : 'translate-x-0'}`}
-        />
+        <span style={{ pointerEvents: "none", display: "inline-block", height: "16px", width: "16px", borderRadius: "999px", background: checked ? "var(--color-surface)" : "rgba(192,192,192,0.4)", boxShadow: "0 1px 3px rgba(0,0,0,0.3)", transform: checked ? "translateX(16px)" : "translateX(0px)", transition: "transform 0.2s ease" }} />
       </button>
     </div>
   );

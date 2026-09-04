@@ -21,7 +21,6 @@ export async function updateArticle(id: string, data: Record<string, unknown>) {
   if (error) throw new Error(error.message);
   revalidatePath("/admin/articles");
   revalidatePath(`/insights/${data.slug ?? ""}`);
-  redirect("/admin/articles");
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -41,7 +40,6 @@ export async function updateProject(id: string, data: Record<string, unknown>) {
   if (error) throw new Error(error.message);
   revalidatePath("/admin/projects");
   revalidatePath(`/work/${data.slug ?? ""}`);
-  redirect("/admin/projects");
 }
 
 export async function createProject(data: Record<string, unknown>) {
@@ -49,5 +47,4 @@ export async function createProject(data: Record<string, unknown>) {
   const { error } = await supabase.from("projects").insert(data);
   if (error) throw new Error(error.message);
   revalidatePath("/admin/projects");
-  redirect("/admin/projects");
 }

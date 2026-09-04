@@ -17,45 +17,24 @@ export default async function AdminDashboardPage() {
     <div style={{ minHeight: "100vh", background: "var(--color-base)" }}>
       <AdminNav />
 
-      <main
-        style={{
-          maxWidth: "1100px",
-          margin: "0 auto",
-          padding: "calc(var(--nav-height, 64px) + 3rem) clamp(1.5rem, 4vw, 3rem) 4rem",
-        }}
-      >
+      <main className="max-w-[1400px] mx-auto px-8 pb-16" style={{ marginLeft: "220px", paddingTop: "3rem" }}>
         {/* Header */}
-        <div style={{ marginBottom: "3rem" }}>
-          <p style={{
-            fontFamily: "var(--font-citadel)",
-            fontSize: "0.75rem",
-            fontStyle: "italic",
-            color: "var(--color-silver)",
-            letterSpacing: "0.15em",
-            marginBottom: "0.5rem",
-          }}>
+        <div className="mb-12">
+          <p style={{ fontFamily: "var(--font-citadel)", fontSize: "0.75rem", fontStyle: "italic", color: "var(--color-silver)", letterSpacing: "0.15em", marginBottom: "0.5rem" }}>
             Internal CMS
           </p>
-          <h1 style={{
-            fontFamily: "var(--font-helvetica)",
-            fontSize: "clamp(1.5rem, 3vw, 2.2rem)",
-            fontWeight: 300,
-            color: "var(--color-text)",
-            letterSpacing: "-0.01em",
-          }}>
+          <h1 style={{ fontFamily: "var(--font-helvetica)", fontSize: "clamp(1.5rem, 3vw, 2.2rem)", fontWeight: 300, color: "var(--color-text)", letterSpacing: "-0.01em" }}>
             Dashboard
           </h1>
         </div>
 
-        {/* Stats grid */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1rem", marginBottom: "3rem" }}>
+        {/* Stats grid — responsive via Tailwind grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-12">
           {CARDS.map(({ label, count, href, cta }) => (
-            <div key={label} style={{
-              background: "var(--color-surface)",
-              border: "1px solid rgba(192,192,192,0.08)",
-              padding: "1.75rem",
-              borderRadius: "2px",
-            }}>
+            <div
+              key={label}
+              style={{ background: "var(--color-surface)", border: "1px solid rgba(192,192,192,0.08)", padding: "1.75rem", borderRadius: "2px" }}
+            >
               <p style={{ fontFamily: "var(--font-citadel)", fontSize: "2.5rem", fontStyle: "italic", color: "var(--color-silver)", lineHeight: 1, marginBottom: "0.5rem" }}>
                 {count}
               </p>
@@ -74,7 +53,7 @@ export default async function AdminDashboardPage() {
           <h2 style={{ fontFamily: "var(--font-helvetica)", fontSize: "0.65rem", letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--color-text-subtle)", marginBottom: "1rem" }}>
             Quick Actions
           </h2>
-          <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
+          <div className="flex flex-wrap gap-3">
             {[
               { label: "Add Project", href: "/admin/projects/new" },
               { label: "Write Article", href: "/admin/articles/new" },
