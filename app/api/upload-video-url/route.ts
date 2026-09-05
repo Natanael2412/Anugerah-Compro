@@ -65,11 +65,6 @@ export async function POST(request: NextRequest) {
       Bucket: bucket,
       Key: key,
       ContentType: filetype,
-      CacheControl: "public, max-age=31536000, immutable",
-      Metadata: {
-        "uploaded-by": user.id,
-        "original-name": filename,
-      },
     });
 
     // Create a presigned URL valid for 3600 seconds (1 hour)

@@ -69,31 +69,48 @@ export default function EditProjectForm({ project }: { project: Project }) {
   const uploadFile = async (file: File, folder: string) => {
     // If the file is a video, use the presigned URL flow to bypass Vercel payload limits
     if (file.type.startsWith("video/")) {
-      const ticketRes = await fetch("/api/upload-video-url", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ filename: file.name, filetype: file.type, folder }),
-      });
-      
-      if (!ticketRes.ok) {
-        const errData = await ticketRes.json().catch(() => ({}));
-        throw new Error(`Failed to get upload ticket (${ticketRes.status}): ${errData.error || file.name}`);
+      try {
+        const ticketRes = await fetch("/api/upload-video-url", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ filename: file.name, filetype: file.type, folder }),
+        });
+        
+        if (!ticketRes.ok) {
+          const errData = await ticketRes.json().catch(() => ({}));
+          throw new Error(`Failed to get upload ticket (${ticketRes.status}): ${errData.error || file.name}`);
+        }
+        
+        const { presignedUrl, publicUrl } = await ticketRes.json();
+        
+        // Upload directly to Cloudflare R2
+        const uploadRes = await fetch(presignedUrl, {
+          method: "PUT",
+          body: file,
+          headers: { "Content-Type": file.type },
+        });
+        
+        if (!uploadRes.ok) {
+          throw new Error(`Direct upload failed (${uploadRes.status}): ${uploadRes.statusText}`);
+        }
+        
+        return publicUrl;
+      } catch (directErr: any) {
+        console.warn("Direct R2 upload failed (e.g. CORS on current port/origin), attempting server fallback...", directErr);
+        // Graceful fallback to server route (succeeds on localhost or if within server payload limit)
+        const fallbackFormData = new FormData();
+        fallbackFormData.append("file", file);
+        fallbackFormData.append("folder", folder);
+        const fallbackRes = await fetch("/api/upload-image", { method: "POST", body: fallbackFormData });
+        if (fallbackRes.ok) {
+          const fallbackData = await fallbackRes.json();
+          return fallbackData.url;
+        }
+
+        throw new Error(
+          `Direct upload failed (${directErr.message}). Server fallback also failed (${fallbackRes.status}). Pastikan CORS R2 mengizinkan origin ${typeof window !== "undefined" ? window.location.origin : ""}.`
+        );
       }
-      
-      const { presignedUrl, publicUrl } = await ticketRes.json();
-      
-      // Upload directly to Cloudflare R2
-      const uploadRes = await fetch(presignedUrl, {
-        method: "PUT",
-        body: file,
-        headers: { "Content-Type": file.type },
-      });
-      
-      if (!uploadRes.ok) {
-        throw new Error(`Direct upload failed (${uploadRes.status}): ${uploadRes.statusText}`);
-      }
-      
-      return publicUrl;
     }
 
     // Default flow for images (goes through Vercel for compression)
